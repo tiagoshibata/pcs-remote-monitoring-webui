@@ -4,7 +4,6 @@ import React from "react";
 import {Modal} from "react-bootstrap";
 import EventTopic from "../../common/eventtopic";
 import Http from "../../common/httpClient";
-import DeviceGroupEditor from "../../components/deviceGroupEditor/deviceGroupEditor";
 import "./genericDropDownList.css";
 
 import $ from "jquery";
@@ -208,7 +207,7 @@ export default class GenericDropDownList extends React.Component {
                     this.props.newItem &&
                     <Modal ref='deviceGroupEditorModal' show={this.state.showModal} bsSize='large'>
                         <Modal.Body>
-                            <DeviceGroupEditor onClose={() => this.setState({showModal: false})}/>
+                            <this.props.newItem.dialog onClose={() => this.setState({showModal: false})}/>
                         </Modal.Body>
                     </Modal>
                 }
