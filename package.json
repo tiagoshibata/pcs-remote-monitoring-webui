@@ -6,6 +6,7 @@
     "adal-angular": "1.0.15",
     "ag-grid": "11.0.0",
     "ag-grid-react": "11.0.0",
+    "ajv": "^5.2.2",
     "bootstrap": "3.3.7",
     "c3": "0.4.14",
     "chart.js": "2.6.0",

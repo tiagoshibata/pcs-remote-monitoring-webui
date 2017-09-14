@@ -21,6 +21,21 @@ export function getTypeOf(val) {
   return 'Text';
 }
 
+export function booleanValue(input) {
+  let number = Number(input);
+  if (!isNaN(number)) {
+    return !!number;
+  }
+  let lower = input.toLowerCase()
+  if (lower === 'y' || lower === 'yes' || lower === 'true') {
+    return true;
+  }
+  if (lower === 'n' || lower === 'no' || lower === 'false') {
+    return false;
+  }
+  return null;
+}
+
 export function typeComputation(cond) {
   cond.type = typeof cond.Value === 'number' ? 'Number' : 'Text';
 }

@@ -205,6 +205,7 @@ const lang = {
   PREVIEWNOTICE: 'Welcome to the IoT Remote Monitoring Preview. New functionality will be added in the coming weeks. Check out our article to learn more.',
   PRIMARYKEY: 'Primary Key',
   PRIMARYTHUMBPRINT: 'Primary thumbprint',
+  PROFILE_SCHEMA_VALIDATION_FAILED: 'Schema validation failed: ',
   PROFILE_NAME_PLACEHOLDER: 'An meaningful name, e.g. DefaultProfile',
   PROPERTIES: 'Properties',
   PROPERTIES_DESCRIPTION: 'Selected Properties on devices',

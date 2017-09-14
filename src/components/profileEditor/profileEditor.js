@@ -5,8 +5,22 @@ import Config from '../../common/config';
 import lang from "../../common/lang";
 import EventTopic, { Topics } from '../../common/eventtopic';
 import Http from '../../common/httpClient';
+import Schema from './schema';
+import { booleanValue } from "../../common/utils";
 
 import './profileEditor.css';
+
+class ExtendableError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = this.constructor.name;
+        if (typeof Error.captureStackTrace === 'function') {
+            Error.captureStackTrace(this, this.constructor);
+        } else {
+            this.stack = (new Error(message)).stack;
+        }
+    }
+}
 
 class ProfileEditor extends React.Component {
 
@@ -20,6 +34,56 @@ class ProfileEditor extends React.Component {
         };
 
         this.subscriptions = [];
+        this.validationError = null;
+    }
+
+    buildPropertyTwin(propertyList) {
+        class PropertyParseError extends ExtendableError {}
+
+        let properties = {};
+        try {
+            propertyList.forEach(property => {
+                if (property.Type === 'String') {
+                    properties[property.Key] = property.Value;
+                } else if (property.Type === 'Number') {
+                    let number = Number(property.Value);
+                    if (isNaN(number)) {
+                      throw new PropertyParseError(lang.PROFILE.NUMBER_PARSE_ERROR + ": " + property.Key + " = " + property.Value);
+                    }
+                    properties[property.Key] = number;
+                } else if (property.Type === 'Boolean') {
+                    let value = booleanValue(property.Value);
+                    if (value === null) {
+                        throw new PropertyParseError(lang.PROFILE.BOOLEAN_PARSE_ERROR + ": " + property.Key + " = " + property.Value);
+                    }
+                    properties[property.Key] = value;
+                } else {
+                    throw new PropertyParseError('Unimplemented property type');
+                }
+            });
+        } catch (e) {
+            if (e instanceof PropertyParseError) {
+                return e.message;
+            }
+            throw e;
+        }
+        return properties;
+    }
+
+    validateProfile() {
+        const valid = this.state.properties.every((c) => c.Key.trim() !== '' && c.Value.trim() !== '');
+        if (!valid) {
+            return lang.PROFILE.EMPTY_ERROR;
+        }
+        let twin = this.buildPropertyTwin(this.state.properties);
+        if (typeof twin === 'String') {
+            return twin;
+        }
+        return Schema.validate(twin);
+    }
+
+    setProperties(properties) {
+        this.setState({properties: properties, message: this.validateProfile()});
     }
 
     componentWillUnmount() {
@@ -27,12 +91,12 @@ class ProfileEditor extends React.Component {
     }
 
     onProfileNameChange = (event) => {
-        this.setState({ groupName: event.target.value });
+        this.setState({ profileName: event.target.value });
     }
 
     onNewClause = () => {
         this.state.properties.push({ Key: '', Value: '', Type: 'String'})
-        this.setState({properties: this.state.properties});
+        this.setProperties(this.state.properties);
     }
 
     onDeleteClause = (index) => {
@@ -40,25 +104,25 @@ class ProfileEditor extends React.Component {
             return;
         }
         this.state.properties.splice(index, 1);
-        this.setState({properties: this.state.properties});
+        this.setProperties(this.state.properties);
     }
 
     onFieldNameChange = (event, index) => {
         var newClauses = this.state.properties.slice();
         newClauses[index].Key = event.target.value;
-        this.setState({properties: newClauses});
+        this.setProperties(newClauses);
     }
 
     onFieldValueChange = (event, index) => {
         var newClauses = this.state.properties.slice();
         newClauses[index].Value = event.target.value;
-        this.setState({properties: newClauses});
+        this.setProperties(newClauses);
     }
 
     onTypeChange = (event, index) => {
         var newClauses = this.state.properties.slice();
         newClauses[index].Type = event.target.value;
-        this.setState({properties: newClauses});
+        this.setProperties(newClauses);
     }
 
     cancel = () => {
@@ -66,18 +130,17 @@ class ProfileEditor extends React.Component {
     }
 
     save = () => {
-        const valid = this.state.properties.every((c) => c.Key.trim() !== '' && c.Value.trim() !== '');
-        if (!valid) {
-            this.setState({message: 'Incorrect filed name or value.'});
-        } else {
-            Http.post(Config.uiConfigApiUrl + '/api/v1/profilegroups/' + this.state.profileName, this.state.properties)
-                .then((data) => {
-                    this.props.onClose();
-                    EventTopic.publish(Topics.profile.changed, null, this);
-                }).catch((err) => {
-                    this.setState({ message: 'Failed to save profile due to: ' + err.message });
-                });
+        if (this.validateProfile() !== null) {
+            return;
         }
+        Http.post(Config.uiConfigApiUrl + '/api/v1/profilegroups/' + this.state.profileName, this.state.properties)
+            .then((data) => {
+                this.props.onClose();
+                EventTopic.publish(Topics.profile.changed, null, this);
+            }).catch((err) => {
+                console.error(err);
+                this.setState({ message: 'Failed to save profile: ' + err.message });
+            });
     }
 
     render() {
@@ -111,7 +174,7 @@ class ProfileEditor extends React.Component {
             <div className="profileEditorTile">
                 <div className= "profileEditorLabel">
                     <label>Group Name</label>
-                    <input className="form-control" style={{ width: "500px" }} value={this.state.groupName} placeholder={lang.PROFILE.NAME_PLACEHOLDER} onChange={this.onProfileNameChange} />
+                    <input className="form-control" style={{ width: "500px" }} value={this.state.profileName} placeholder={lang.PROFILE.NAME_PLACEHOLDER} onChange={this.onProfileNameChange} />
                 </div>
                 <div className="profileEditorTable">
                     <table>
@@ -124,7 +187,7 @@ class ProfileEditor extends React.Component {
                     </table>
                 </div>
                 <div className="profileEditorControls">
-                    <p className="profileEditorWarning">{this.state.message}</p>
+                    <pre className="profileEditorWarning">{this.state.message}</pre>
                     <button className="btn btn-default profileEditorButton" onClick={this.save}>Save</button>
                     <button className="btn btn-default profileEditorButton" style={{ marginRight:"10px" }} onClick={this.cancel}>Cancel</button>
                 </div>
