@@ -7,13 +7,11 @@ import {formatString, isFunction} from "../../common/utils";
 import * as uuid from "uuid/v4"
 import lang from "../../common/lang";
 import DeviceProperty from "../deviceProperty/deviceProperty";
-import Config from "../../common/config";
-import httpClient from "../../common/httpClient";
+import ApiService from "../../common/apiService";
 
 import "./deviceConfig.css";
 
 
-const DeviceConfigRoute = 'Jobs';
 const DefaultExecutionTime = 0;
 
 class DeviceConfig extends React.Component {
@@ -38,12 +36,10 @@ class DeviceConfig extends React.Component {
                     }
                 }
             };
-            httpClient.post(
-                Config.iotHubManagerApiUrl + DeviceConfigRoute,
-                payload
-            ).catch((err)=>{
-                console.log(err);
-            });
+            ApiService.scheduleJobs(payload)
+                .catch((err)=>{
+                    console.log(err);
+                });
         }
 
         if (isFunction(this.props.finishCallback)) {
