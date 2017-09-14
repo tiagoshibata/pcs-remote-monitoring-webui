@@ -3,6 +3,8 @@
 import React from "react";
 
 import {Button} from "react-bootstrap";
+import GenericDropDownList from '../../components/genericDropDownList/genericDropDownList';
+import ProfileEditor from '../../components/profileEditor/profileEditor';
 import {formatString, isFunction} from "../../common/utils";
 import * as uuid from "uuid/v4"
 import lang from "../../common/lang";
@@ -57,6 +59,23 @@ class DeviceConfig extends React.Component {
                     <DeviceProperty ref="deviceProperty" />
                 </div>
                 <div className="marginTop20">
+                    <label>{lang.APPLYPROFILE}</label>
+                    <div className="profile-list-button">
+                      <GenericDropDownList
+                        id="Profiles"
+                        menuAlign="right"
+                        requestUrl={Config.deviceGroupApiUrl}
+                        initialState={{
+                          defaultText: lang.CHOOSEPROFILE
+                        }}
+                        newItem={{
+                          text: lang.NEWPROFILE,
+                          dialog: ProfileEditor
+                        }}
+                        publishTopic={'foo'}
+                        reloadRequestTopic={'bar'}
+                      />
+                    </div>
                     <label>{formatString(lang.CAUTION, deviceCount)}</label>
                     <Button className="btnConfirm" onClick={() => this.onConfirm()}>{lang.CONFIRM}</Button>
                 </div>

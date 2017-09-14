@@ -1,0 +1,37 @@
+.profileEditorTile {
+    margin:5px;
+    color:#000000;
+    overflow-y: auto;
+}
+
+.profileEditorLabel {
+    margin: 10px 0px 10px 0px;
+}
+
+.profileEditorInput {
+    width: 280px;
+}
+
+.profileEditorTable {
+    margin: 10px 0px 10px 0px;
+    min-height: 230px;
+    max-height: 230px;
+    overflow-Y: auto;
+}
+
+.profileEditorTable td {
+    padding: 5px 5px 0px 0px;
+}
+
+.profileEditorControls {
+    padding: 5px 5px 0px 0px;
+}
+
+.profileEditorWarning {
+    color: red;
+    float: left;
+}
+
+.profileEditorButton {
+    float: right;
+}
