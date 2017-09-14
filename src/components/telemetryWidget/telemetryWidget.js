@@ -4,6 +4,7 @@ import React from 'react';
 import Config from '../../common/config';
 import { Topics } from '../../common/eventtopic';
 import GenericDropDownList from '../../components/genericDropDownList/genericDropDownList';
+import DeviceGroupEditor from '../../components/deviceGroupEditor/deviceGroupEditor';
 import CurveChart from '../../components/curveChart/curveChart';
 
 export default class TelemetryWidget extends React.Component {
@@ -22,7 +23,7 @@ export default class TelemetryWidget extends React.Component {
                             }}
                             newItem={{
                                 text: '(new group)',
-                                dialog: 'deviceGroupEditor'
+                                dialog: DeviceGroupEditor
                             }}
                             publishTopic={Topics.dashboard.deviceGroup.selected}
                             reloadRequestTopic={Topics.dashboard.deviceGroup.changed}>

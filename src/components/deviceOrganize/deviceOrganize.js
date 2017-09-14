@@ -11,7 +11,7 @@ import "./deviceOrganize.css"
 import Config from "../../common/config";
 import httpClient from "../../common/httpClient";
 
-const DeviceConifgRoute = 'Jobs';
+const DeviceConfigRoute = 'Jobs';
 const DefaultExecutionTime = 0;
 
 class DeviceOrganize extends React.Component {
@@ -35,7 +35,7 @@ class DeviceOrganize extends React.Component {
                 }
             };
             httpClient.post(
-                Config.iotHubManagerApiUrl + DeviceConifgRoute,
+                Config.iotHubManagerApiUrl + DeviceConfigRoute,
                 payload
             ).catch((err)=>{
                 console.log(err);

@@ -6,6 +6,7 @@ import { bindActionCreators } from 'redux';
 import Config from '../../common/config';
 import { Topics } from '../../common/eventtopic';
 import GenericDropDownList from '../../components/genericDropDownList/genericDropDownList';
+import DeviceGroupEditor from '../../components/deviceGroupEditor/deviceGroupEditor';
 import AddDevice from '../addDevice/addDevice';
 import DeviceTag from '../deviceTag/deviceTag';
 import DeviceReconfigure from '../deviceReconfigure/deviceReconfigure';
@@ -129,7 +130,7 @@ export class DeviceList extends Component {
               }}
               newItem={{
                 text: lang.DEVICES.NEWGROUP,
-                dialog: 'deviceGroupEditor'
+                dialog: DeviceGroupEditor
               }}
               publishTopic={Topics.dashboard.deviceGroup.selected}
               reloadRequestTopic={Topics.dashboard.deviceGroup.changed}
