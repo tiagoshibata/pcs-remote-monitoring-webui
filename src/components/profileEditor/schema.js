@@ -3,11 +3,21 @@ import lang from '../../common/lang'
 
 const schema = {
   "properties": {
-    "smaller": {
-      "type": "number",
-      "maximum": 24
-    },
-    "larger": { "type": "number" }
+    "desired": {
+      "properties": {
+        "windows": {
+          "properties": {
+            "rebootInfo": {
+              "properties": {
+                "singleRebootTime": {
+                  "type": "date-time"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 };
 
