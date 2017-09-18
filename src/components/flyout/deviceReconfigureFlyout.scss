@@ -47,6 +47,11 @@
     margin-top: 14px;
   }
 
+  .schema-error {
+    color: red;
+    float: left;
+  }
+
   .common-reconfigure-container {
     .name-value-type {
       height: 40px;
@@ -65,6 +70,13 @@
       &:focus { border: 1px solid $lightestGray !important; }
 
     }
+  }
+
+  .jsoneditor-container {
+    margin-top: 24px;
+    background-color: white;
+    height: 100%;
+    width: 100%;
   }
 
   .summary-container {

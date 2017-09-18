@@ -3,10 +3,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as uuid from 'uuid/v4';
-import Rx from 'rxjs';
-import _ from 'lodash';
-
+import JsonEditor from '@dr-kobros/react-jsoneditor';
 import lang from '../../common/lang';
 import * as actions from '../../actions';
 
@@ -20,10 +17,11 @@ import DeepLinkSection from '../deepLinkSection/deepLinkSection';
 import { getTypeOf } from '../../common/utils';
 import PcsBtn from '../shared/pcsBtn/pcsBtn';
 import SummarySection from '../shared/summarySection/summarySection';
-
+import GenericDropDownList from '../../components/genericDropDownList/genericDropDownList';
+import ProfileEditor from '../../components/profileEditor/profileEditor';
+import Schema from '../../schema';
 import './deviceReconfigureFlyout.css';
 
-const validReportedProperties = [Config.STATUS_CODES.TYPE, Config.STATUS_CODES.LOCATION, Config.STATUS_CODES.FIRMWARE];
 
 const getRelatedJobs = (devices, propertyUpdateJobs) => {
   if (!devices || !propertyUpdateJobs || !devices.length || !propertyUpdateJobs.length) return [];
@@ -35,168 +33,50 @@ class DeviceReconfigureFlyout extends React.Component {
     super();
     this.inputReference = {};
     this.state = {
-      commonConfiguration: [],
-      jobInputValue: '',
-      jobApplied: false,
-      jobId: ''
+      desiredProperties: {
+        windows: {
+          rebootInfo: {
+            singleRebootTime: "2017-09-18T16:00:00-08:00"
+          }
+        }
+      },
+      editorMode: 'code',
+      jobName: '',
+      jobApplied: false
     };
+    this.editorOptions = {mode: this.state.editorMode}
 
-    this.commonConfigValueChanged = this.commonConfigValueChanged.bind(this);
-    this.onChangeInput = this.onChangeInput.bind(this);
+    this.onJobNameChange = this.onJobNameChange.bind(this);
     this.applyDeviceConfigureJobsData =this.applyDeviceConfigureJobsData.bind(this);
     this.checkJobStatus = this.checkJobStatus.bind(this);
   }
 
-  componentDidMount() {
-    const { devices, propertyUpdateJobs } = this.props;
-    this.checkJobStatus(devices, propertyUpdateJobs);
-    this.calcCommonConfiguration(devices);
+  onJobNameChange(event) {
+    this.setState({ jobName: event.target.value });
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { devices, propertyUpdateJobs } = nextProps;
-    if (!_.isEqual(propertyUpdateJobs, this.props.propertyUpdateJobs)) {
-      this.checkJobStatus(devices, propertyUpdateJobs);
-    }
-    if (!_.isEqual(devices, this.props.devices)) {
-      this.calcCommonConfiguration(devices);
-    }
-  }
-
-  checkJobStatus (devices, propertyUpdateJobs) {
-    if(!devices || !propertyUpdateJobs || !devices.length || !propertyUpdateJobs.length) return;
-    const jobs = getRelatedJobs(devices, propertyUpdateJobs);
-    const deviceIdSet = new Set(devices.map(({Id}) => Id));
-    Rx.Observable.from(jobs)
-      .flatMap(({ jobId, deviceIds }) =>
-        Rx.Observable
-          .fromPromise(ApiService.getJobStatus(jobId))
-          // Get completed jobs
-          .filter(({ status }) => status === 3)
-          .do(_ => this.props.actions.removePropertyJob(jobId))
-          .flatMap(_ => deviceIds)
-      )
-      .distinct()
-      .filter(deviceId => deviceIdSet.has(deviceId))
-      .flatMap(deviceId => ApiService.getDeviceById(deviceId))
-      .reduce((devices, device) => [...devices, device], [])
-      .subscribe(
-        devices => {
-          this.props.actions.updateDevicesItems(devices);
-          this.props.actions.updateDevices(devices)
-        },
-        error => console.log('error', error)
-      );
-  }
-
-  calcCommonConfiguration(devices) {
-    const commonConfiguration = [];
-    if (!devices) return;
-    const uncommonReportedPropValueMap = {};
-    /*
-    If user selected only one device then it returns all the value from Properties.Reported
-    'validReportedProperties' is the type, location and firmware. So taking each key and
-    checking wheather the value is present or undefined. It's not mandatory that it should
-    have all three.
-    */
-    if (devices.length === 1) {
-      const device = devices[0];
-      if (device && device.Properties && device.Properties.Reported) {
-        const { Reported, Desired } = device.Properties;
-        validReportedProperties.forEach(key => {
-          if (Reported[key] !== undefined) {
-            commonConfiguration.push({
-              label: key,
-              value: (Desired[key] && Desired[key] !== Reported[key]) ? `${Reported[key]} ${lang.SYNCING} ${Desired[key]}` : Reported[key],
-              type: getTypeOf(Reported[key]),
-              desired: Desired[key] ? true : false
-            });
-          }
-        });
-      }
-    } else {
-    /*
-    When user selected multiple devices then, we have to look for validReportedProperties and
-    What ever is common return only those validReportedProperties. Sometimes the values of
-    those type, location can be different in that Make it value as "Multiple".
-    */
-      devices.forEach(device => {
-        validReportedProperties.forEach(reportedProp => {
-          if (!device || !device.Properties || !device.Properties.Reported) {
-            uncommonReportedPropValueMap[reportedProp] = true;
-            return;
-          }
-          const { Reported } = device.Properties;
-          if (Reported[reportedProp] === undefined || Reported[reportedProp] === null) {
-            uncommonReportedPropValueMap[reportedProp] = true;
-          }
-        });
-      });
-
-      // Compute the common property value per reported property across selected devices
-      const valuesMap = {};
-      devices.forEach(device => {
-        if (!device || !device.Properties || !device.Properties.Reported) return;
-        const { Reported, Desired } = device.Properties;
-        validReportedProperties.forEach(reportedProp => {
-          if (uncommonReportedPropValueMap[reportedProp]) return;
-          if (Reported[reportedProp] !== undefined) {
-            const commonValue = valuesMap[reportedProp] === Reported[reportedProp] ? valuesMap[reportedProp] : lang.MULTIPLE;
-            if (valuesMap[reportedProp] !== undefined) {
-              // If the values are shared across devices, show the value, if not, show 'Multiple'
-              valuesMap[reportedProp] = commonValue;
-            } else {
-              valuesMap[reportedProp] = Reported[reportedProp];
-            }
-            if (Desired[reportedProp] && Reported[reportedProp] !== Desired[reportedProp]) {
-              valuesMap[reportedProp] = commonValue === lang.MULTIPLE ? `${commonValue} ${lang.SYNCING}` : `${commonValue} ${lang.SYNCING} ${Desired[reportedProp]}`
-            }
-          }
-        });
-      });
-
-      Object.keys(valuesMap).forEach(key => {
-        commonConfiguration.push({
-          label: key,
-          value: valuesMap[key],
-          type: getTypeOf(valuesMap[key]),
-          desired: valuesMap[key].indexOf(lang.SYNCING) !== -1
-        });
-      });
-    }
-
-    this.setState({ commonConfiguration });
-  }
-
-  commonConfigValueChanged(reportedProp, value) {
-    const { commonConfiguration } = this.state;
-    commonConfiguration.some(item => {
-      if (item.label === reportedProp) {
-        item.value = value;
-        return true;
-      }
-      return false;
-    });
-    this.setState({ commonConfiguration });
+  setProperties = properties => {
+    this.setState({desiredProperties: properties, message: Schema.validateDesiredProperties(properties)});
   }
 
   onChangeInput(event) {
     this.setState({ jobInputValue: sanitizeJobName(event.target.value || '') });
   }
 
+  switchEditorType = () => {
+    this.setState({ editorMode: this.state.editorMode == 'tree' ? 'code' : 'tree' });
+    this.editorOptions = {mode: this.state.editorMode}
+  }
+
   applyDeviceConfigureJobsData() {
     const { devices } = this.props;
-    const deviceIds = devices.map(({ Id }) => `'${Id}'`).join(',');
-    const reportedProps = {};
-    this.state.commonConfiguration.forEach(item => {
-      reportedProps[item.label] = item.value;
-    });
+    const deviceIds = devices.map(device => `'${device.Id}'`).join(',');
     const payload = {
-      JobId: this.state.jobInputValue ? this.state.jobInputValue + '-' + uuid() : uuid(),
+      JobId: this.state.jobName ? this.state.jobName + '-' + uuid() : uuid(),
       QueryCondition: `deviceId in [${deviceIds}]`,
       updateTwin: {
         Properties: {
-          Desired: reportedProps
+          Desired: this.state.desiredProperties
         }
       }
     };
@@ -215,72 +95,9 @@ class DeviceReconfigureFlyout extends React.Component {
     });
   }
 
-  commonReconfigure() {
-    const { commonConfiguration } = this.state;
-    if (!commonConfiguration || !commonConfiguration.length) {
-      return (
-        <div className="no-common-properties-container">
-          <div className="no-common-description">
-            {lang.NO_AVAILABLE_COMMON_TAGS}
-          </div>
-          <div className="no-common-description">
-            {lang.PLEASE_CHOOSE_DEVICES_WITH_COMMON_TAGS}
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="common-reconfigure-container">
-        <div className="device-configuration-row name-value-type">
-          <span className="device-configuration-items">
-            {lang.FIELD}
-          </span>
-          <span className="device-configuration-items">
-            {lang.VALUE}
-          </span>
-          <span className="device-configuration-items">
-            {lang.TYPE}
-          </span>
-        </div>
-        {commonConfiguration.map((item, idx) =>
-          <div className="device-configuration-row name-value-type" key={item.label} onClick={() => {this.inputReference[idx] && this.inputReference[idx].focus()}}>
-            <span className="device-configuration-items">
-              {item.label}
-            </span>
-            {item.label !== Config.STATUS_CODES.FIRMWARE
-              ? item.desired
-                  ? <span className="device-configuration-items value-for-existed-data">
-                      {item.value}
-                    </span>
-                  : <input
-                      type="text"
-                      className="device-configuration-items value-for-existed-data"
-                      onChange={evt => this.commonConfigValueChanged(item.label, evt.target.value)}
-                      value={item.value}
-                      ref={(ip) => this.inputReference[idx] = ip}
-                    />
-              : <span className="device-configuration-items value-for-existed-data">
-                  {item.value}
-                </span>}
-            <span className="device-configuration-items">
-              {item.type}
-            </span>
-          </div>
-        )}
-      </div>
-    );
-  }
-
   render() {
-    let totalAffectedDevices = this.props.devices ? this.props.devices.length : 0;
-    const disabledButton = !this.state.jobInputValue;
-    const deepLinkSectionProps = {
-      path: `/maintenance/job/${this.state.jobId}`,
-      description: lang.VIEW_JOB_STATUS,
-      linkText: lang.VIEW
-    };
-
+    let totalEffectedDevices = this.props.devices ? this.props.devices.length : 0;
+    const disabledButton = !this.state.jobName;
     return (
       <div className="device-configuration-container">
         <div className="sub-heading">
@@ -297,12 +114,53 @@ class DeviceReconfigureFlyout extends React.Component {
             type="text"
             className="style-manage"
             placeholder={lang.RECONFIGURE_JOB}
-            onChange={this.onChangeInput}
-            value={this.state.jobInputValue}
+            onChange={this.onJobNameChange}
+            value={this.state.jobName}
           />
           <div className="jobname-reference">
             <span className="asterisk">*</span>
             {lang.JOB_NAME_REFERENCE}
+        </div>
+
+        <div className="marginTop20">
+            <label>{lang.DEVICES.APPLYPROFILE}</label>
+            <div className="profile-list-button">
+              <GenericDropDownList
+                id="Profiles"
+                menuAlign="right"
+                requestUrl={Config.deviceGroupApiUrl}
+                initialState={{
+                  defaultText: lang.DEVICES.CHOOSEPROFILE
+                }}
+                newItem={{
+                  text: lang.DEVICES.NEWPROFILE,
+                  dialog: ProfileEditor
+                }}
+                publishTopic={'foo'}
+                reloadRequestTopic={'bar'}
+              />
+            </div>
+        </div>
+
+        <div className="jsoneditor-container">
+          <JsonEditor width='100%' value={this.state.desiredProperties} options={this.editorOptions} onChange={this.setProperties} ref={(editor) => { this.editor = editor; }} />
+          <button
+            className="pcs-btn primary"
+            type="button"
+            onClick={this.switchEditorType}
+          >Use batata editor mode</button>
+          <pre className="schema-error">{this.state.message}</pre>
+        </div>
+
+        <div className="summary-container">
+          {lang.SUMMARY}
+          <div className="affected-devices">
+            <span className="num-affected-devices">
+              {totalAffectedDevices}
+            </span>
+            <span className="affected-devices-name">
+              {lang.AFFECTED_DEVICES}
+            </span>
           </div>
         </div>
         {this.commonReconfigure()}
