@@ -40,11 +40,9 @@ class DeviceReconfigureFlyout extends React.Component {
           }
         }
       },
-      editorMode: 'code',
       jobName: '',
       jobApplied: false
     };
-    this.editorOptions = {mode: this.state.editorMode}
 
     this.onJobNameChange = this.onJobNameChange.bind(this);
     this.applyDeviceConfigureJobsData =this.applyDeviceConfigureJobsData.bind(this);
@@ -57,15 +55,6 @@ class DeviceReconfigureFlyout extends React.Component {
 
   setProperties = properties => {
     this.setState({desiredProperties: properties, message: Schema.validateDesiredProperties(properties)});
-  }
-
-  onChangeInput(event) {
-    this.setState({ jobInputValue: sanitizeJobName(event.target.value || '') });
-  }
-
-  switchEditorType = () => {
-    this.setState({ editorMode: this.state.editorMode == 'tree' ? 'code' : 'tree' });
-    this.editorOptions = {mode: this.state.editorMode}
   }
 
   applyDeviceConfigureJobsData() {
@@ -143,12 +132,7 @@ class DeviceReconfigureFlyout extends React.Component {
         </div>
 
         <div className="jsoneditor-container">
-          <JsonEditor width='100%' value={this.state.desiredProperties} options={this.editorOptions} onChange={this.setProperties} ref={(editor) => { this.editor = editor; }} />
-          <button
-            className="pcs-btn primary"
-            type="button"
-            onClick={this.switchEditorType}
-          >Use batata editor mode</button>
+          <JsonEditor width='100%' value={this.state.desiredProperties} options={{mode: 'tree'}} onChange={this.setProperties} ref={(editor) => { this.editor = editor; }} />
           <pre className="schema-error">{this.state.message}</pre>
         </div>
 
