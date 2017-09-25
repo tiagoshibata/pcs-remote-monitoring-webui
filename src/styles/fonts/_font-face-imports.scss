@@ -27,9 +27,9 @@
 
 @font-face {
   font-family: $fontSelawikSemibold;
-  src: url('assets/fonts/selawksb.eot'); 
-  src: url('assets/fonts/selawksb.eot?#iefix') format('embedded-opentype'),
-       url('assets/fonts/selawksb.ttf') format('truetype');
+  src: url('./assets/fonts/selawksb.eot'); 
+  src: url('./assets/fonts/selawksb.eot?#iefix') format('embedded-opentype'),
+       url('./assets/fonts/selawksb.ttf') format('truetype');
 }
 
 @font-face {
