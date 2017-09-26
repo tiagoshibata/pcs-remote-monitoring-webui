@@ -14,6 +14,13 @@ $rowHeightWithPadding: ($rowHeight + 8px);
 $headerColor: #9fa8b1;
 $checkboxPadding: 8px;
 
+.pcs-grid-loading-container {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  padding: 20px 0px;
+}
+
 .pcs-grid-container.ag-dark.pcs-ag-dark {
   background-color: $darkBgColor;
   position: relative;

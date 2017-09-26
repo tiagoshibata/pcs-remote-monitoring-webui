@@ -3,6 +3,7 @@
 import React, { Component } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { isFunction } from '../../common/utils';
+import Spinner from '../spinner/spinner';
 
 import '../../../node_modules/ag-grid/dist/styles/ag-grid.css';
 import '../../../node_modules/ag-grid/dist/styles/theme-dark.css';
@@ -104,10 +105,17 @@ export class PcsGrid extends Component {
       onSelectionChanged: this.onSelectionChanged,
       onRowClicked: this.onRowClicked
     };
+
+    const { rowData, pcsLoadingTemplate } = this.props;
+
     return (
-      <div className="pcs-grid-container ag-dark pcs-ag-dark">
-        <AgGridReact {...gridParams} />
-      </div>
+      !rowData
+        ? <div className="pcs-grid-loading-container">
+            { !pcsLoadingTemplate ? <Spinner /> : pcsLoadingTemplate }
+          </div>
+        : <div className="pcs-grid-container ag-dark pcs-ag-dark">
+            <AgGridReact {...gridParams} />
+          </div>
     );
   }
 }
