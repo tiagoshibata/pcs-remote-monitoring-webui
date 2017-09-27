@@ -115,6 +115,7 @@ const lang = {
   FIRMWARE_URL: 'Firmware URI',
   FIRMWARE_URL_INPUT_PLACEHOLDER: 'Enter firmware URI value',
   GENERATEDEVICEID: 'Generate an ID for me',
+  GOTO_MAINTENANCE: 'Go to Maintenance detail page',
   GROUP: 'Group',
   GROUPNAME: 'Group Name',
   GROUPNAMEALREADYEXISTS: 'Group name already exists',
