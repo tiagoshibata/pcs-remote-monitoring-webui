@@ -5,6 +5,7 @@ import flyoutReducer from './flyoutReducer';
 import modalReducer from './modalReducer';
 import deviceReducer from './deviceReducer';
 import mapReducer from './mapReducer';
+import profileReducer from './profileReducer'
 import telemetryReducer from './telemetryReducer';
 import filterReducer from './filterReducer';
 import systemStatusJobReducer from './systemStatusJobReducer';
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   deviceReducer,
   systemStatusJobReducer,
   mapReducer,
+  profileReducer,
   telemetryReducer,
   filterReducer,
   kpiReducer,

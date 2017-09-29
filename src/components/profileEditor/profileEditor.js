@@ -1,11 +1,10 @@
 // Copyright (c) Microsoft. All rights reserved.
 
 import React from 'react';
-import Config from '../../common/config';
+import { connect } from 'react-redux';
 import lang from "../../common/lang";
-import EventTopic, { Topics } from '../../common/eventtopic';
-import Http from '../../common/httpClient';
 import Schema from '../../schema';
+import { saveOrUpdateProfile } from '../../actions/profileEditorActions';
 import JsonEditor from '@dr-kobros/react-jsoneditor';
 
 import './profileEditor.css';
@@ -15,46 +14,42 @@ class ProfileEditor extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            profileName: '',
-            properties: {
-                desired: {
-                    windows: {
-                        rebootInfo: {
-                            singleRebootTime: "2017-09-18T16:00:00-08:00"
-                        }
-                    }
-                }
+        if (props.profile) {
+            this.state = {
+                Id: props.profile.Id,
+                ETag: props.profile.ETag,
+                DisplayName: props.profile.DisplayName,
+                DesiredProperties: props.profile.DesiredProperties
+            };
+        } else {
+            this.state = {
+                DisplayName: '',
+                DesiredProperties: {}
             }
-        };
-
+        }
         this.subscriptions = [];
     }
 
     setProperties = properties => {
-        this.setState({properties: properties, message: Schema.validateDesiredProperties(this.state.properties)});
-    }
-
-    componentWillUnmount = () => {
-        EventTopic.unsubscribe(this.subscriptions);
+        this.setState({DesiredProperties: properties, message: Schema.validateDesiredProperties(this.state.properties)});
     }
 
     onProfileNameChange = event => {
-        this.setState({ profileName: event.target.value });
+        this.setState({ DisplayName: event.target.value });
     }
 
     save = () => {
-        if (Schema.validateDesiredProperties(this.state.properties) !== null) {
+        if (Schema.validateDesiredProperties(this.state.DesiredProperties) !== null) {
             return;
         }
-        Http.post(Config.uiConfigApiUrl + '/api/v1/profilegroups/' + this.state.profileName, this.state.properties)
-            .then((data) => {
-                this.props.onClose();
-                EventTopic.publish(Topics.profile.changed, null, this);
-            }).catch((err) => {
-                console.error(err);
-                this.setState({ message: 'Failed to save profile: ' + err.message });
-            });
+        const profile = {
+            Id: this.state.Id,
+            ETag: this.state.ETag,
+            DisplayName: this.state.DisplayName,
+            DesiredProperties: this.state.DesiredProperties,
+        }
+        this.props.saveOrUpdateProfile(profile);
+        this.props.onClose();
     }
 
     render() {
@@ -62,10 +57,10 @@ class ProfileEditor extends React.Component {
             <div className="profileEditorTile">
                 <div className= "profileEditorLabel">
                     <label>Group Name</label>
-                    <input className="form-control" style={{ width: "500px" }} value={this.state.profileName} placeholder={lang.PROFILE.NAME_PLACEHOLDER} onChange={this.onProfileNameChange} />
+                    <input className="form-control" style={{ width: "500px" }} value={this.state.DisplayName} placeholder={lang.PROFILE_NAME_PLACEHOLDER} onChange={this.onProfileNameChange} />
                 </div>
                 <div className="profileEditorTable">
-                    <JsonEditor value={this.state.properties} options={{mode: "tree"}} onChange={this.setProperties} />
+                    <JsonEditor value={this.state.DesiredProperties} options={{mode: "tree"}} width='100%' height='100%' onChange={this.setProperties} />
                 </div>
                 <div className="profileEditorControls">
                     <pre className="profileEditorWarning">{this.state.message}</pre>
@@ -77,4 +72,10 @@ class ProfileEditor extends React.Component {
     }
 }
 
-export default ProfileEditor
+const mapDispatchToProps = dispatch => ({
+    saveOrUpdateProfile: (profile) => {
+        dispatch(saveOrUpdateProfile(profile));
+    }
+});
+
+export default connect(null, mapDispatchToProps)(ProfileEditor)

@@ -42,7 +42,7 @@ export default class GenericDropDownList extends React.Component {
                 url += '/' + query;
             }
 
-            Http.get(url).then((data) => this.setItems(data));
+            Http.get(url).then(this.setItems);
 
             this.setState({loading: true});
         } else {
@@ -50,7 +50,10 @@ export default class GenericDropDownList extends React.Component {
         }
     }
 
-    setItems(items) {
+    setItems = (items) => {
+        if (typeof items === 'object') {
+            items = items.items;
+        }
         // Normalize items to object array
         items = items.map(item => typeof item === 'object' ? item : {id: item, text: item, selected: false});
 

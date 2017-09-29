@@ -117,12 +117,12 @@ class DeviceReconfigureFlyout extends React.Component {
               <GenericDropDownList
                 id="Profiles"
                 menuAlign="right"
-                requestUrl={Config.deviceGroupApiUrl}
+                requestUrl={`${Config.configApiUrl}profiles`}
                 initialState={{
-                  defaultText: lang.DEVICES.CHOOSEPROFILE
+                  defaultText: lang.PROFILE_CHOOSE
                 }}
                 newItem={{
-                  text: lang.DEVICES.NEWPROFILE,
+                  text: lang.PROFILE_NEW,
                   dialog: ProfileEditor
                 }}
                 publishTopic={'foo'}

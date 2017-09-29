@@ -26,6 +26,33 @@ function postGroupData(group) {
   return data;
 }
 
+/**
+ * Delete Object properties with value of empty array or empty string
+ *
+ * @param params An object containing API parameters
+ */
+function filterParamObject(params) {
+  const newParams = Object.assign({}, params);
+  Object.keys(params)
+    .forEach(param => {
+      const value = params[param];
+      if (value === '' || (Array.isArray(value) && value.length === 0)) {
+        delete newParams[param];
+      }
+    });
+  return newParams;
+}
+
+function profileData(profile) {
+  const data = {
+    Id: profile.Id,
+    ETag: profile.ETag,
+    DisplayName: profile.DisplayName
+  };
+  data.DesiredProperties = _.cloneDeep(profile.DesiredProperties) || [];
+  return data;
+}
+
 class ApiService {
   static getCurrentUser() {
     return Http.get(`${Config.authApiUrl}users/current`);
@@ -193,6 +220,23 @@ class ApiService {
     return Http.post(`${Config.configApiUrl}devicegroups`, data);
   }
 
+  static updateProfile(profile) {
+    if (!profile) {
+      throw new Error('expected valid profile object');
+    }
+    const data = profileData(profile);
+
+    return Http.put(`${Config.configApiUrl}profiles/${profile.Id}`, data);
+  }
+
+  static postProfile(profile) {
+    if (!profile) {
+      throw new Error('expected valid profile object');
+    }
+    const data = profileData(profile);
+    return Http.post(`${Config.configApiUrl}profiles`, data);
+  }
+
   static updateDeviceTagValue(device, newTagValueMap) {
     if (!device) {
       throw new Error('expected valid group object');
@@ -214,6 +258,13 @@ class ApiService {
       throw new Error('expected valid group object');
     }
     return Http.delete(`${Config.configApiUrl}devicegroups/${group.Id}`);
+  }
+
+  static deleteProfile(profile) {
+    if (!profile) {
+      throw new Error('expected valid profile object');
+    }
+    return Http.delete(`${Config.configApiUrl}profiles/${profile.Id}`);
   }
 
   static serializeParamObject(params) {
@@ -240,6 +291,10 @@ class ApiService {
 
   static getMapKey() {
     return Http.get(`${Config.configApiUrl}solution-settings/theme`);
+  }
+
+  static getProfiles() {
+    return Http.get(`${Config.configApiUrl}profiles`);
   }
 
   static updateAlarmsStatus(payload) {
