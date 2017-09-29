@@ -45,11 +45,13 @@ function filterParamObject(params) {
 
 function profileData(profile) {
   const data = {
-    Id: profile.Id,
-    ETag: profile.ETag,
     DisplayName: profile.DisplayName
   };
   data.DesiredProperties = _.cloneDeep(profile.DesiredProperties) || [];
+  if (profile.Id && profile.ETag) {
+    data.Id = profile.Id;
+    data.ETag = profile.ETag;
+  }
   return data;
 }
 

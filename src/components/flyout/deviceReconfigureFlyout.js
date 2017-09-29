@@ -118,6 +118,7 @@ class DeviceReconfigureFlyout extends React.Component {
                 id="Profiles"
                 menuAlign="right"
                 requestUrl={`${Config.configApiUrl}profiles`}
+                requestObjectToListModel={item => ({id: item.Id, text: item.DisplayName})}
                 initialState={{
                   defaultText: lang.PROFILE_CHOOSE
                 }}

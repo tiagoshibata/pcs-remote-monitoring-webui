@@ -125,6 +125,7 @@ export class DeviceList extends Component {
               id="DeviceGroups"
               menuAlign="right"
               requestUrl={Config.deviceGroupApiUrl}
+              requestObjectToListModel={item => ({id: item, text: item})}
               initialState={{
                 defaultText: lang.DEVICES.CHOOSEDEVICES
               }}

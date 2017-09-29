@@ -50,12 +50,11 @@ export default class GenericDropDownList extends React.Component {
         }
     }
 
-    setItems = (items) => {
+    setItems = items => {
         if (typeof items === 'object') {
             items = items.items;
         }
-        // Normalize items to object array
-        items = items.map(item => typeof item === 'object' ? item : {id: item, text: item, selected: false});
+        items = items.map(this.props.requestObjectToListModel);  // Object containing 'id', 'text' and 'selected' keys
 
         // Get selected ids
         let selectedIds = [];
