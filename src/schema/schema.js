@@ -1,21 +1,6 @@
 import Ajv from 'ajv';
-import lang from './common/lang'
-
-const desiredPropertiesSchema = {
-  "properties": {
-    "windows": {
-      "properties": {
-        "rebootInfo": {
-          "properties": {
-            "singleRebootTime": {
-              "format": "date-time"
-            }
-          }
-        }
-      }
-    }
-  }
-};
+import { desiredPropertiesSchema } from './definition'
+import lang from '../common/lang'
 
 const desiredPropertiesValidator = new Ajv().compile(desiredPropertiesSchema);
 

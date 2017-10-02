@@ -3,7 +3,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import lang from "../../common/lang";
-import Schema from '../../schema';
+import Schema from '../../schema/schema';
 import { saveOrUpdateProfile } from '../../actions/profileEditorActions';
 import JsonEditor from '@dr-kobros/react-jsoneditor';
 
@@ -31,7 +31,7 @@ class ProfileEditor extends React.Component {
     }
 
     setProperties = properties => {
-        this.setState({DesiredProperties: properties, message: Schema.validateDesiredProperties(this.state.properties)});
+        this.setState({DesiredProperties: properties, message: Schema.validateDesiredProperties(properties)});
     }
 
     onProfileNameChange = event => {
@@ -60,7 +60,7 @@ class ProfileEditor extends React.Component {
                     <input className="form-control" style={{ width: "500px" }} value={this.state.DisplayName} placeholder={lang.PROFILE_NAME_PLACEHOLDER} onChange={this.onProfileNameChange} />
                 </div>
                 <div className="profileEditorTable">
-                    <JsonEditor value={this.state.DesiredProperties} options={{mode: "tree"}} width='100%' height='100%' onChange={this.setProperties} />
+                    <JsonEditor value={this.state.DesiredProperties} options={{mode: "tree"}} width='100%' height='500px' onChange={this.setProperties} />
                 </div>
                 <div className="profileEditorControls">
                     <pre className="profileEditorWarning">{this.state.message}</pre>

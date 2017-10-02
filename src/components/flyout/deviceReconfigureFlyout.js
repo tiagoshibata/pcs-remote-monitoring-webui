@@ -11,8 +11,6 @@ import * as uuid from 'uuid/v4';
 import CancelX from '../../assets/icons/CancelX.svg';
 import Apply from '../../assets/icons/Apply.svg';
 import ApiService from '../../common/apiService';
-import Config from '../../common/config';
-import {sanitizeJobName} from '../../common/utils';
 import EventTopic, { Topics } from '../../common/eventtopic';
 import Spinner from '../spinner/spinner';
 import DeepLinkSection from '../deepLinkSection/deepLinkSection';
@@ -21,7 +19,7 @@ import PcsBtn from '../shared/pcsBtn/pcsBtn';
 import SummarySection from '../shared/summarySection/summarySection';
 import GenericDropDownList from '../../components/genericDropDownList/genericDropDownList';
 import ProfileEditor from '../../components/profileEditor/profileEditor';
-import Schema from '../../schema';
+import Schema from '../../schema/schema';
 import './deviceReconfigureFlyout.css';
 
 

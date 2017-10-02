@@ -49,7 +49,7 @@ class ManageProfilesFlyout extends React.Component {
   render() {
     return (
       <div className="manage-profile-container">
-        <div onClick={this.onClick} className="create-profile">
+        <div onClick={() => this.setState({showEditor: true})} className="create-profile">
           <img src={Add} alt={`${Add}`} className="add-icon" />
           {lang.CREATEPROFILE}
         </div>

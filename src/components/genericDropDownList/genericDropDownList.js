@@ -33,13 +33,13 @@ export default class GenericDropDownList extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        const newItems = nextProps.items, currentItems = this.state.items;
+        const newItems = nextProps.items.map(this.props.requestObjectToListModel), currentItems = this.state.items;
         const hasChangedItem = (a, b) => {
             const pairs = _.zip(a, b);
-            return pairs.some((pair) => {pair[0].ETag != pair[1].ETag});
+            return pairs.some((pair) => pair[0].id !== pair[1].id || pair[0].text !== pair[1].text);
         }
 
-        if (newItems.length != currentItems.length || hasChangedItem(newItems, currentItems)) {
+        if (newItems.length !== currentItems.length || hasChangedItem(newItems, currentItems)) {
             this.setItems(nextProps.items);
         }
     }
