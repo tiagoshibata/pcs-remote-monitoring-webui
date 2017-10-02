@@ -35,7 +35,7 @@ export const Topics = {
         itemsSelected: 'grid.itemsSelected'
     },
     profile: {
-      changed: 'profile.changed'
+      selected: 'profile.selected'
     }
 };
 

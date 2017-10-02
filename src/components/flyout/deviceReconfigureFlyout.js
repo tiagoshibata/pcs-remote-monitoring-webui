@@ -6,12 +6,14 @@ import { bindActionCreators } from 'redux';
 import JsonEditor from '@dr-kobros/react-jsoneditor';
 import lang from '../../common/lang';
 import * as actions from '../../actions';
-
+import { getDeviceProfiles } from '../../actions/manageProfilesFlyoutActions';
+import * as uuid from 'uuid/v4';
 import CancelX from '../../assets/icons/CancelX.svg';
 import Apply from '../../assets/icons/Apply.svg';
 import ApiService from '../../common/apiService';
 import Config from '../../common/config';
 import {sanitizeJobName} from '../../common/utils';
+import EventTopic, { Topics } from '../../common/eventtopic';
 import Spinner from '../spinner/spinner';
 import DeepLinkSection from '../deepLinkSection/deepLinkSection';
 import { getTypeOf } from '../../common/utils';
@@ -31,7 +33,7 @@ const getRelatedJobs = (devices, propertyUpdateJobs) => {
 class DeviceReconfigureFlyout extends React.Component {
   constructor() {
     super();
-    this.inputReference = {};
+    this.subscriptions = [];
     this.state = {
       desiredProperties: {
         windows: {
@@ -47,6 +49,26 @@ class DeviceReconfigureFlyout extends React.Component {
     this.onJobNameChange = this.onJobNameChange.bind(this);
     this.applyDeviceConfigureJobsData =this.applyDeviceConfigureJobsData.bind(this);
     this.checkJobStatus = this.checkJobStatus.bind(this);
+  }
+
+  componentWillMount() {
+    this.props.getDeviceProfiles();
+  }
+
+  componentDidMount = () => {
+    this.subscriptions.push(EventTopic.subscribe(Topics.profile.selected, (topic, id, publisher) => {
+      if (!id[0]) {
+        this.setState({desiredProperties: {}});
+        return;
+      }
+      const profile = this.props.profiles.find((profile => profile.Id === id[0]));
+      const desiredProperties = profile.DesiredProperties;
+      this.setState({desiredProperties});
+    }));
+  }
+
+  componentWillUnmount() {
+    EventTopic.unsubscribe(this.subscriptions);
   }
 
   onJobNameChange(event) {
@@ -117,7 +139,6 @@ class DeviceReconfigureFlyout extends React.Component {
               <GenericDropDownList
                 id="Profiles"
                 menuAlign="right"
-                requestUrl={`${Config.configApiUrl}profiles`}
                 requestObjectToListModel={item => ({id: item.Id, text: item.DisplayName})}
                 initialState={{
                   defaultText: lang.PROFILE_CHOOSE
@@ -126,8 +147,9 @@ class DeviceReconfigureFlyout extends React.Component {
                   text: lang.PROFILE_NEW,
                   dialog: ProfileEditor
                 }}
-                publishTopic={'foo'}
-                reloadRequestTopic={'bar'}
+                ref={(profileSelector) => { this.profileSelector = profileSelector; }}
+                publishTopic={Topics.profile.selected}
+                items={this.props.profiles}
               />
             </div>
         </div>
@@ -169,18 +191,16 @@ class DeviceReconfigureFlyout extends React.Component {
   }
 }
 
-const mapDispatchToProps = dispatch => {
-  return {
-    actions: bindActionCreators(actions, dispatch)
-  };
-};
+const mapDispatchToProps = dispatch => ({
+  getDeviceProfiles: () => {
+     dispatch(getDeviceProfiles());
+  },
+  actions: bindActionCreators(actions, dispatch)
+});
 
-const mapStateToProps = state => {
-  return {
-    devices: state.flyoutReducer.devices,
-    deviceETags: state.flyoutReducer.deviceETags || {},
-    propertyUpdateJobs: state.systemStatusJobReducer.propertyUpdateJobs
-  };
-};
+const mapStateToProps = state => ({
+  devices: state.flyoutReducer.devices,
+  profiles: state.profileReducer.profiles
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(DeviceReconfigureFlyout);

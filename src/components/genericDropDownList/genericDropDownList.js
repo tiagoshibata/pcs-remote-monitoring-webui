@@ -2,6 +2,7 @@
 
 import React from "react";
 import {Modal} from "react-bootstrap";
+import _ from 'lodash';
 import EventTopic from "../../common/eventtopic";
 import Http from "../../common/httpClient";
 import "./genericDropDownList.css";
@@ -31,6 +32,18 @@ export default class GenericDropDownList extends React.Component {
         this.getItemList();
     }
 
+    componentWillReceiveProps(nextProps) {
+        const newItems = nextProps.items, currentItems = this.state.items;
+        const hasChangedItem = (a, b) => {
+            const pairs = _.zip(a, b);
+            return pairs.some((pair) => {pair[0].ETag != pair[1].ETag});
+        }
+
+        if (newItems.length != currentItems.length || hasChangedItem(newItems, currentItems)) {
+            this.setItems(nextProps.items);
+        }
+    }
+
     componentWillUnmount() {
         EventTopic.unsubscribe(this.subscriptions);
     }
@@ -45,13 +58,11 @@ export default class GenericDropDownList extends React.Component {
             Http.get(url).then(this.setItems);
 
             this.setState({loading: true});
-        } else {
-            this.setItems(this.props.items || []);
         }
     }
 
     setItems = items => {
-        if (typeof items === 'object') {
+        if (typeof items === 'object' && !Array.isArray(items)) {
             items = items.items;
         }
         items = items.map(this.props.requestObjectToListModel);  // Object containing 'id', 'text' and 'selected' keys
