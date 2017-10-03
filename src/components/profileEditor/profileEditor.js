@@ -31,7 +31,47 @@ class ProfileEditor extends React.Component {
     }
 
     setProperties = properties => {
-        this.setState({DesiredProperties: properties, message: Schema.validateDesiredProperties(properties)});
+      this.setState({DesiredProperties: properties, message: Schema.validateDesiredProperties(properties)});
+    }
+
+    mergeObjects(target, source) {
+      const isObject = x => x && typeof x === 'object' && !Array.isArray(x);
+
+      for (const key in source) {
+        if (isObject(source[key])) {
+          if (!isObject(target[key])) {
+            target[key] = source[key];
+          } else {
+            this.mergeObjects(target[key], source[key]);
+          }
+        } else {
+          target[key] = source[key];
+        }
+      }
+
+      return target;
+    }
+
+    checkJsonInput = event => {
+      let json;
+      try {
+          json = JSON.parse(event.target.value);
+      } catch (e) {
+          this.setState({message: 'JSON document is invalid'});
+          return;
+      }
+
+      const error = Schema.validateDesiredProperties(json);
+      if (error !== null) {
+          this.setState({message: error});
+          return;
+      }
+      this.setState({jsonInput: json, message: null});  /// FIXME use separate message state variables
+    }
+
+    mergeJsonInput = () => {
+      const mergedObject = this.mergeObjects(this.state.DesiredProperties, this.state.jsonInput);
+      this.setState({DesiredProperties: mergedObject});  /// FIXME Update editor
     }
 
     onProfileNameChange = event => {
@@ -43,10 +83,12 @@ class ProfileEditor extends React.Component {
             return;
         }
         const profile = {
-            Id: this.state.Id,
-            ETag: this.state.ETag,
             DisplayName: this.state.DisplayName,
             DesiredProperties: this.state.DesiredProperties,
+        }
+        if (this.state.Id && this.state.ETag) {
+            profile.Id = this.state.Id;
+            profile.ETag = this.state.ETag;
         }
         this.props.saveOrUpdateProfile(profile);
         this.props.onClose();
@@ -60,7 +102,9 @@ class ProfileEditor extends React.Component {
                     <input className="form-control" style={{ width: "500px" }} value={this.state.DisplayName} placeholder={lang.PROFILE_NAME_PLACEHOLDER} onChange={this.onProfileNameChange} />
                 </div>
                 <div className="profileEditorTable">
-                    <JsonEditor value={this.state.DesiredProperties} options={{mode: "tree"}} width='100%' height='500px' onChange={this.setProperties} />
+                    <JsonEditor ref={(editor) => { this.jsonEditor = editor; }} value={this.state.DesiredProperties} options={{mode: "tree"}} width='100%' height='500px' onChange={this.setProperties} />
+                    <textarea placeholder="Merge JSON document with editor" onChange={this.checkJsonInput}></textarea>
+                    <button className="btn btn-default" onClick={this.mergeJsonInput}>Merge</button>
                 </div>
                 <div className="profileEditorControls">
                     <pre className="profileEditorWarning">{this.state.message}</pre>
