@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import lang from "../../common/lang";
 import Schema from '../../schema/schema';
 import { saveOrUpdateProfile } from '../../actions/profileEditorActions';
-import JsonEditor from '@dr-kobros/react-jsoneditor';
+import JsonEditor from '../jsonEditor/jsonEditor';
 
 import './profileEditor.css';
 

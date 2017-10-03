@@ -6,7 +6,7 @@ import ApiService from '../common/apiService';
 
 export const saveOrUpdateProfile = profile => {
   return (dispatch, getState) => {
-    if (profile.Id === 0) {
+    if (!profile.Id) {
       return ApiService.postProfile(profile)
         .then(data => {
           dispatch({
