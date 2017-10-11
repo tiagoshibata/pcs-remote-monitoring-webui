@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
+import DMWizard from "../dmWizard/dmWizard";
 import lang from "../../common/lang";
 import Schema from '../../schema/schema';
 import { saveOrUpdateProfile } from '../../actions/profileEditorActions';
@@ -105,6 +106,9 @@ class ProfileEditor extends React.Component {
                     <JsonEditor ref={(editor) => { this.jsonEditor = editor; }} value={this.state.DesiredProperties} options={{mode: "tree"}} width='100%' height='500px' onChange={this.setProperties} />
                     <textarea placeholder="Merge JSON document with editor" onChange={this.checkJsonInput}></textarea>
                     <button className="btn btn-default" onClick={this.mergeJsonInput}>Merge</button>
+                </div>
+                <div className="DMWizard">
+                    <DMWizard />
                 </div>
                 <div className="profileEditorControls">
                     <pre className="profileEditorWarning">{this.state.message}</pre>
