@@ -73,7 +73,12 @@ class ApiService {
   }
 
   static getDevicesForGroup(selectedGroupConditions) {
-    const encodedParam = encodeURIComponent(JSON.stringify(selectedGroupConditions));
+    let encodedParam;
+    if (!selectedGroupConditions) {
+      encodedParam = '';
+    } else {
+      encodedParam = encodeURIComponent(JSON.stringify(selectedGroupConditions));
+    }
     return Http.get(`${Config.iotHubManagerApiUrl}devices?query=${encodedParam}`);
   }
 
