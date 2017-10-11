@@ -8,6 +8,7 @@ import Rx from 'rxjs';
 
 import Drawer from './drawer';
 import JsonViewer from '../jsonViewer/jsonViewer';
+import JsonEditor from '../jsonEditor/jsonEditor';
 import DeviceIcon from '../../assets/icons/DeviceIcon1.svg';
 import lang from '../../common/lang';
 import ApiService from '../../common/apiService';
@@ -316,7 +317,7 @@ class DeviceDetailFlyout extends Component {
     const { device } = this.props.content;
     const { radioBtnOptions } = this.state;
     const { Properties, Tags, IsSimulated } = device;
-    const { Reported, Desired } = Properties;
+    const { Reported } = Properties;
     const { SupportedMethods } = Reported;
     const selectedColor = '#ffffff';
     const unselectedColor = '#afb9c3';
@@ -358,102 +359,6 @@ class DeviceDetailFlyout extends Component {
         )
       : null;
     const deviceType = ((Reported || {}).DeviceType || {}).Name || '';
-    /*
-     * 	Properties shown are: Location, Firmware Version, and Type
-     */
-    // TODO: confirm firmware obj structure
-    const deviceProperties = Object.keys(Reported).map((key, index) => {
-      if (key === lang.TYPE && Reported[key] !== '') {
-        if (Desired[key] && Desired[key] !== Reported[key]) {
-          return (
-            <tr key={index}>
-              <td>
-                {key}
-              </td>
-              <td>
-                {Reported[key]}
-              </td>
-              <td>
-                {`${lang.SYNCING} ${Desired[key]}`}
-              </td>
-            </tr>
-          );
-        }
-        return (
-          <tr key={index}>
-            <td>
-              {key}
-            </td>
-            <td>
-              {Reported[key]}
-            </td>
-          </tr>
-        );
-      }
-      if (key === lang.LOCATION && Reported[key]) {
-        const deviceLocation = Reported[key];
-        if (Desired[key] && Desired[key] !== Reported[key]) {
-          const desiredLocation = Desired[key];
-          return (
-            <tr key={index}>
-              <td>
-                {key}
-              </td>
-              <td>
-                {deviceLocation}
-              </td>
-              <td>
-                `${lang.SYNCING} ${desiredLocation}`
-              </td>
-            </tr>
-          );
-        }
-        if (deviceLocation) {
-          return (
-            <tr key={index}>
-              <td>
-                {key}
-              </td>
-              <td>
-                {deviceLocation}
-              </td>
-            </tr>
-          );
-        }
-      }
-      if (key === lang.FIRMWARE && Reported[key]) {
-        const deviceFirmware = Reported[key];
-        if (Desired[key] && Desired[key] !== Reported[key]) {
-          const desiredFirmware = Desired[key];
-          return (
-            <tr key={index}>
-              <td>
-                {key}
-              </td>
-              <td>
-                {deviceFirmware}
-              </td>
-              <td>
-                `${lang.SYNCING} ${desiredFirmware}`
-              </td>
-            </tr>
-          );
-        }
-        if (deviceFirmware) {
-          return (
-            <tr key={index}>
-              <td>
-                {key}
-              </td>
-              <td>
-                {deviceFirmware}
-              </td>
-            </tr>
-          );
-        }
-      }
-      return null;
-    });
     const alarmsGridProps = {
       rowData: this.state.alarmRowData,
       pagination: false
@@ -535,23 +440,8 @@ class DeviceDetailFlyout extends Component {
           title={lang.PROPERTIES}
           description={lang.PROPERTIES_DESCRIPTION}
         >
-          <div className="drawer-content">
-            {deviceProperties.length > 0 &&
-              <table>
-                <thead>
-                  <tr>
-                    <th>
-                      {lang.PROPERTIES}
-                    </th>
-                    <th>
-                      {lang.VALUE}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {deviceProperties}
-                </tbody>
-              </table>}
+          <div className="json-viewer-content">
+            <JsonEditor options={{onEditable: node => false}} value={Reported} expanded={true} width='100%' height='500px'></JsonEditor>
           </div>
         </Drawer>
         <Drawer

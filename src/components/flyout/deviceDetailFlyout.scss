@@ -36,6 +36,13 @@
     font-weight: bold;
     cursor: pointer;
   }
+
+  .json-viewer-content {
+    margin-top: 24px;
+    background-color: white;
+    height: 100%;
+    width: 100%;
+  }
 }
 
 // customize scroll bar for webkit based browser

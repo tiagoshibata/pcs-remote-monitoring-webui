@@ -8,17 +8,12 @@ import './dmWizard.css';
 
 
 class DMWizard extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         return (
             <div className="dmWizard">
               <p>DMWizard</p>
               <Spoiler name={lang.APPLICATION_MANAGEMENT}>
-                <p>Report store applications
-                Report non-store applications</p>
+                <p>Application management properties</p>
               </Spoiler>
             </div>
         );

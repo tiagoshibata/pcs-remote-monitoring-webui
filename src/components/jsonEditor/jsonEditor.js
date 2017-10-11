@@ -43,6 +43,9 @@ class JsonEditor extends React.PureComponent {
 
     this.editor = new JSONEditor(this.div, mergedOptions);
     this.editor.set(value);
+    if (this.props.expanded) {
+      this.editor.expandAll();
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -62,7 +65,7 @@ class JsonEditor extends React.PureComponent {
 
     if (this.state.dirty === true && !this.state.controllingFocus) {
       this.timeout = setTimeout(() => {
-        onChange(this.state.currentValue);
+        onChange && onChange(this.state.currentValue);
         this.setState({
           dirty: false
         });

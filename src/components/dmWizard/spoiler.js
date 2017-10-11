@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft. All rights reserved.
 
 import React from 'react';
-import lang from "../../common/lang";
 
 import './spoiler.css';
 
