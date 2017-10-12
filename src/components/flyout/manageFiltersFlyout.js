@@ -146,31 +146,6 @@ class ManageFiltersFlyout extends React.Component {
     );
   }
 
-  getFieldOptions() {
-    const tagPrefix='tags.';
-    const reportedPrefix='Properties.Reported.';
-    const fields = this.props.deviceGroupFilters || {};
-    let tags = [];
-    let reported = [];
-    if (fields.Tags) {
-      tags = fields.Tags.map((t) => {
-        return {
-          value: tagPrefix + t,
-          label: tagPrefix + t
-        }
-      });
-    }
-    if (fields.Reported){
-      reported = fields.Reported.map((r) => {
-        return {
-          value: reportedPrefix + r,
-          label: reportedPrefix + r
-        }
-      });
-    }
-    return [...tags, ...reported];
-  }
-
   /**
    * This function will render the filter form. It optionally takes a group
    * object to prefill the form with the device group specific data.
@@ -208,7 +183,11 @@ class ManageFiltersFlyout extends React.Component {
       {
         value: ']',
         label: Config.STATUS_CODES.CLOSEBRACKET
-      }
+      },
+      {
+        value: 'E',
+        label: Config.STATUS_CODES.EXISTS
+      },
     ];
     let typeOptions = [
       {
@@ -220,7 +199,6 @@ class ManageFiltersFlyout extends React.Component {
         label: lang.TEXT
       }
     ];
-    let fieldOptions = this.getFieldOptions();
 
     return (
       <div className="editable-filters">
@@ -265,18 +243,15 @@ class ManageFiltersFlyout extends React.Component {
                     <div className="label-names">
                       {lang.FIELD}
                     </div>
-                    <Select
-                      autofocus
-                      options={fieldOptions}
-                      value={cond.Key}
-                      onChange={value => {
+                    <input
+                      onChange={event => {
                         this.setEditingState(group.Id, { formChanged: true });
-                        cond.Key = value;
+                        cond.Key = event.target.value;
                       }}
-                      simpleValue
-                      searchable={true}
+                      type="text"
+                      value={cond.key}
+                      className="style-manage"
                       placeholder={lang.ENTERREPORTED}
-                      className="select-style-manage"
                     />
                   </label>
                 </div>

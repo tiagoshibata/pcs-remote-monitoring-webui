@@ -33,6 +33,7 @@ const Config = {
     GE: '>= Greater than/equal',
     LE: '<= Less than/equal',
     BRACKET: '[] In',
+    EXISTS: 'E Exists',
     STRING: 'String',
     BOOLEAN: 'Boolean',
     OPENBRACKET: '[ Starts with',

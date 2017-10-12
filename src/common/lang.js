@@ -113,6 +113,7 @@ const lang = {
   ENTER_KEYS_MANUALLY: 'Enter keys manually',
   ENTER_YOUR_KEY: 'Enter your key here...',
   EQUALS: '= Equals',
+  EXISTS: 'E Exists',
   EVENT_NAME: 'Event Name',
   EXPLOREALARM: 'Explore Alarm',
   EXPLORE: 'Explore',
