@@ -249,7 +249,7 @@ class ManageFiltersFlyout extends React.Component {
                         cond.Key = event.target.value;
                       }}
                       type="text"
-                      value={cond.key}
+                      value={cond.Key}
                       className="style-manage"
                       placeholder={lang.ENTERREPORTED}
                     />
@@ -277,6 +277,7 @@ class ManageFiltersFlyout extends React.Component {
                     </div>
                   </label>
                 </div>
+                {cond.Operator !== 'E' && (
                 <div>
                   <label>
                     <div className="label-names">
@@ -302,16 +303,10 @@ class ManageFiltersFlyout extends React.Component {
                     />
                   </label>
 
-                  {this.checkIfConditionValueIsEmpty(group.Id, idx)
-                    ? <div className="error-msg">
-                        {lang.VALUECANNOTBEEMPTY}
-                      </div>
-                    : null}
-                </div>
-                <div>
-                  <label>
-                    <div className="label-names">
-                      {lang.TYPE}
+                      {this.checkIfConditionValueIsEmpty(group.Id, idx) &&
+                        <div className="error-msg">
+                          {lang.VALUECANNOTBEEMPTY}
+                        </div>}
                     </div>
                     <Select
                       autofocus
@@ -379,7 +374,7 @@ class ManageFiltersFlyout extends React.Component {
                   //do not save
                   return;
                 }
-                if (group.Conditions.some(cond => !cond.Value)) {
+                if (group.Conditions.some(cond => cond.Operator !== 'E' && !cond.Value)) {
                   return;
                 }
                 this.setEditingState(group.Id, { saveInProgress: true });
