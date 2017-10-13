@@ -26,23 +26,6 @@ function postGroupData(group) {
   return data;
 }
 
-/**
- * Delete Object properties with value of empty array or empty string
- *
- * @param params An object containing API parameters
- */
-function filterParamObject(params) {
-  const newParams = Object.assign({}, params);
-  Object.keys(params)
-    .forEach(param => {
-      const value = params[param];
-      if (value === '' || (Array.isArray(value) && value.length === 0)) {
-        delete newParams[param];
-      }
-    });
-  return newParams;
-}
-
 function profileData(profile) {
   const data = {
     DisplayName: profile.DisplayName
