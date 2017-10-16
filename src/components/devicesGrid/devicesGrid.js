@@ -41,6 +41,8 @@ class DevicesGrid extends Component {
       deviceColumnDefs.firmware,
       deviceColumnDefs.telemetry,
       deviceColumnDefs.status,
+      deviceColumnDefs.errors,
+      deviceColumnDefs.compliant,
       deviceColumnDefs.lastConnection
     ];
 

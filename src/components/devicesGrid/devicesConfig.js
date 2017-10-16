@@ -48,6 +48,16 @@ export const deviceColumnDefs = {
     field: 'Connected',
     cellRendererFramework: ConnectionStatusRenderer
   },
+  errors: {
+    headerName: lang.ERRORS,
+    field: 'Properties.Reported.windows.errors',
+    valueFormatter: ({ value }) => checkForEmpty(value)
+  },
+  compliant: {
+    headerName: lang.COMPLIANT,
+    field: 'Properties.Reported.windows.applying',
+    valueFormatter: ({ value }) => checkForEmpty(value)
+  },
   lastConnection: {
     headerName: lang.LASTCONNECTION,
     field: 'LastActivity',
