@@ -19,23 +19,28 @@ export const checkboxParams = {
 /** A collection of column definitions for the devices grid */
 export const deviceColumnDefs = {
   id: {
-    headerName: lang.DEVICENAME,
+    headerName: lang.ID,
     field: 'Id',
     sort: 'asc'
   },
-  isSimulated: {
-    headerName: lang.SIMULATED,
-    field: 'IsSimulated',
-    cellRendererFramework: IsSimulatedRenderer
+  name: {
+    headerName: lang.NAME,
+    field: 'Properties.Reported.windows.deviceInfo.name',
+    valueFormatter: ({ value }) => checkForEmpty(value)
   },
-  deviceType: {
-    headerName: lang.DEVICETYPE,
-    field: 'Properties.Reported.Type',
+  model: {
+    headerName: lang.MODEL,
+    field: 'Properties.Reported.windows.deviceInfo.model',
     valueFormatter: ({ value }) => checkForEmpty(value)
   },
   firmware: {
     headerName: lang.FIRMWARE,
-    field: 'Properties.Reported.Firmware',
+    field: 'Properties.Reported.windows.deviceInfo.fwVer',
+    valueFormatter: ({ value }) => checkForEmpty(value)
+  },
+  os: {
+    headerName: lang.OS_VERSION,
+    field: 'Properties.Reported.windows.deviceInfo.osVer',
     valueFormatter: ({ value }) => checkForEmpty(value)
   },
   telemetry: {
@@ -58,14 +63,6 @@ export const deviceColumnDefs = {
     field: 'Properties.Reported.windows.applying',
     valueFormatter: ({ value }) => checkForEmpty(value)
   },
-  lastConnection: {
-    headerName: lang.LASTCONNECTION,
-    field: 'LastActivity',
-    valueFormatter: ({ value }) => {
-      const time = moment(value);
-      return checkForEmpty((time.unix() > 0) ? time.format(DEFAULT_TIME_FORMAT) : '');
-    }
-  }
 };
 
 /** Given a device object, extract and return the device Id */

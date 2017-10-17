@@ -36,14 +36,14 @@ class DevicesGrid extends Component {
     // Default device grid columns
     this.columnDefs = [
       { ...deviceColumnDefs.id, ...checkboxParams },
-      deviceColumnDefs.isSimulated,
-      deviceColumnDefs.deviceType,
+      deviceColumnDefs.name,
+      deviceColumnDefs.model,
       deviceColumnDefs.firmware,
+      deviceColumnDefs.os,
       deviceColumnDefs.telemetry,
       deviceColumnDefs.status,
       deviceColumnDefs.errors,
       deviceColumnDefs.compliant,
-      deviceColumnDefs.lastConnection
     ];
 
     // Define context filter buttons
