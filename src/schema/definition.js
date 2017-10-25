@@ -3,12 +3,16 @@ const appsSchema = {
     type: 'object',
     properties: {
       '?': {
-        'store': { type: 'boolean' },
-        'nonStore': { type: 'boolean' }
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+          'store': { type: 'boolean' },
+          'nonStore': { type: 'boolean' }
+        }
       }
     },
     patternProperties: {
-      '.*': {
+      '.+': {
         type: 'object',
         additionalProperties: false,
         properties: {

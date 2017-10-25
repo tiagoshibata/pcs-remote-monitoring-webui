@@ -214,6 +214,7 @@ const lang = {
   PRIMARYTHUMBPRINT: 'Primary thumbprint',
   PROFILE_SCHEMA_VALIDATION_FAILED: 'Schema validation failed: ',
   PROFILE_CHOOSE: 'Choose a profile',
+  PROFILE_NAME: 'Profile name',
   PROFILE_NAME_PLACEHOLDER: 'An meaningful name, e.g. DefaultProfile',
   PROPERTIES: 'Properties',
   PROPERTIES_DESCRIPTION: 'Selected Properties on devices',

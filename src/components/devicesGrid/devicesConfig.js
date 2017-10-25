@@ -1,10 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved.
-
-import moment from 'moment';
 import lang from '../../common/lang';
 import ConnectionStatusRenderer from '../cellRenderers/connectionStatusRenderer/connectionStatusRenderer';
-import IsSimulatedRenderer from '../cellRenderers/isSimulatedRenderer/isSimulatedRenderer';
-import { EMPTY_FIELD_VAL, DEFAULT_TIME_FORMAT, gridValueFormatters } from '../pcsGrid/pcsGridConfig';
+import { EMPTY_FIELD_VAL, gridValueFormatters } from '../pcsGrid/pcsGridConfig';
 
 const { checkForEmpty } = gridValueFormatters;
 

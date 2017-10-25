@@ -72,7 +72,7 @@ class ApiService {
       to
     };
     if (deviceIds) paramsMap.devices = deviceIds;
-    return Http.get(`${Config.telemetryApiUrl}alarms?${ApiService.serializeParamObject(paramsMap)}`);
+    return ApiService.getAlarms(paramsMap);
   }
 
   static getAlarmsListForDeviceMap(deviceIds) {

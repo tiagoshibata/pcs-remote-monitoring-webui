@@ -27,7 +27,6 @@ it('should work well in server-less mode', () => {
             publishTopic='pubTestTopic'
             initialState={{
                 defaultText: 'defaultText',
-                selectFirstItem: true
             }}
             multipleSelect={true}
             items={[
@@ -44,8 +43,9 @@ it('should work well in server-less mode', () => {
                     text: 'Text 2'
                 },
             ]}
+            requestObjectToListModel={item => item}
         />);
-    expect(wrapper.find('.btn').text()).toEqual('Text 0');
+    expect(wrapper.find('.btn').text()).toEqual('defaultText');
 
     jest.spyOn(EventTopic, "publish").mockImplementationOnce((topic, ids, publisher) => {
         expect(topic).toEqual('pubTestTopic');
@@ -64,37 +64,4 @@ it('should work well in server-less mode', () => {
     expect(wrapper.find('.btn').text()).toEqual('Text 2');
 
     EventTopic.publish.mockRestore();
-});
-
-it('should work well in server mode', async () => {
-    let loadingTask = Promise.resolve(["Item0", "Item1", "Item2"]);
-    jest.spyOn(Http, "get").mockImplementationOnce((url) => {
-        return loadingTask;
-    });
-
-    const wrapper = mount(
-        <GenericDropDownList
-            publishTopic='pubTestTopic'
-            reloadRequestTopic='subTestTopic'
-            requestUrl='http://requestUrl'
-            initialState={{
-                defaultText: 'defaultText',
-                selectFirstItem: false
-            }}
-        />);
-
-    await loadingTask;
-    expect(wrapper.find('li').map(o=>o.text())).toEqual(['Item0', 'Item1', 'Item2']);
-
-    loadingTask = Promise.resolve(["Item4", "Item5"]);
-    jest.spyOn(Http, "get").mockImplementationOnce((url) => {
-        return loadingTask;
-    });
-
-    EventTopic.publishSync('subTestTopic', null, wrapper.instance());
-    await loadingTask;
-
-    expect(wrapper.find('li').length).toEqual(2);
-    expect(wrapper.find('li').map(o=>o.text())).toEqual(['Item4', 'Item5']);
-    Http.get.mockRestore();
 });

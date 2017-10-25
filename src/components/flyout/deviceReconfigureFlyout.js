@@ -23,11 +23,6 @@ import Schema from '../../schema/schema';
 import './deviceReconfigureFlyout.css';
 
 
-const getRelatedJobs = (devices, propertyUpdateJobs) => {
-  if (!devices || !propertyUpdateJobs || !devices.length || !propertyUpdateJobs.length) return [];
-  return propertyUpdateJobs.filter(job => devices.some(({ Id }) => job.deviceIds.indexOf(Id) !== -1));
-}
-
 class DeviceReconfigureFlyout extends React.Component {
   constructor() {
     super();
