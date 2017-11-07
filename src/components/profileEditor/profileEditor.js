@@ -99,21 +99,25 @@ class ProfileEditor extends React.Component {
         return (
             <div className="profileEditorTile">
                 <div className= "profileEditorLabel">
-                    <label>Group Name</label>
+                    <label>{lang.PROFILE_NAME}</label>
                     <input className="form-control" style={{ width: "500px" }} value={this.state.DisplayName} placeholder={lang.PROFILE_NAME_PLACEHOLDER} onChange={this.onProfileNameChange} />
-                </div>
-                <div className="profileEditorTable">
-                    <JsonEditor ref={(editor) => { this.jsonEditor = editor; }} value={this.state.DesiredProperties} options={{mode: "tree"}} width='100%' height='500px' onChange={this.setProperties} />
-                    <textarea placeholder="Merge JSON document with editor" onChange={this.checkJsonInput}></textarea>
-                    <button className="btn btn-default" onClick={this.mergeJsonInput}>Merge</button>
                 </div>
                 <div className="DMWizard">
                     <DMWizard />
                 </div>
-                <div className="profileEditorControls">
-                    <pre className="profileEditorWarning">{this.state.message}</pre>
-                    <button className="btn btn-default profileEditorButton" onClick={this.save}>Save</button>
+                <div className="profileEditorTable">
+                    <JsonEditor ref={(editor) => { this.jsonEditor = editor; }} value={this.state.DesiredProperties} options={{mode: "tree"}} width='100%' height='500px' onChange={this.setProperties} />
+                    <textarea placeholder="Merge JSON document with editor" onChange={this.checkJsonInput}></textarea>
+                    <div>
+                      <button className="btn btn-default" onClick={this.mergeJsonInput}>Merge</button>
+                    </div>
+                </div>
+                <div>
+                    <button className="btn btn-default profileEditorButton" onClick={this.save} disabled={this.state.message !== null}>Save</button>
                     <button className="btn btn-default profileEditorButton" style={{ marginRight:"10px" }} onClick={this.props.onClose}>Cancel</button>
+                </div>
+                <div>
+                    {this.state.message && <pre className="profileEditorWarning">{this.state.message}</pre>}
                 </div>
             </div>
         );

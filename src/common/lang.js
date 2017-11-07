@@ -309,6 +309,7 @@ const lang = {
   VIEW_JOB_STATUS: 'View job status progress in Maintenance page',
   WARNING: 'Warning',
   WARNINGS: 'Warnings',
+  WINDOWS_UPDATE: 'Windows update',
   X509: 'X.509',
   YES: 'Yes'
 };
