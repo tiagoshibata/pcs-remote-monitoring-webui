@@ -76,7 +76,7 @@ function ajax(url, options) {
         console.error('User is not authorized for: ' + url);
         return null;
       } else {
-        var error = new Error(response.status + ': ' + response.statusText);
+        var error = new Error(response.status + ': ' + response.statusText + ' for: ' + url);
         error.response = response;
         throw error;
       }
