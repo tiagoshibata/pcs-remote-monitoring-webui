@@ -303,10 +303,17 @@ class ManageFiltersFlyout extends React.Component {
                     />
                   </label>
 
-                      {this.checkIfConditionValueIsEmpty(group.Id, idx) &&
-                        <div className="error-msg">
-                          {lang.VALUECANNOTBEEMPTY}
-                        </div>}
+                  {this.checkIfConditionValueIsEmpty(group.Id, idx)
+                    ? <div className="error-msg">
+                        {lang.VALUECANNOTBEEMPTY}
+                      </div>
+                    : null}
+                </div>
+                )}
+                <div>
+                  <label>
+                    <div className="label-names">
+                      {lang.TYPE}
                     </div>
                     <Select
                       autofocus

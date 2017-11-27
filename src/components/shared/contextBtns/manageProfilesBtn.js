@@ -13,7 +13,7 @@ class ManageProfilesBtn extends Component {
       <PcsBtn
         svg={ManageProfilesSvg}
         onClick={this.props.openManageProfilesFlyout.bind(this, this.props.profiles)}
-        value={lang.MANAGEPROFILES} />
+        value={lang.MANAGE_PROFILES} />
     );
   }
 }

@@ -2,6 +2,7 @@
 import React from "react";
 import JSONEditor from "jsoneditor";
 import styled from "styled-components";
+import "jsoneditor/dist/jsoneditor.css";
 
 class JsonEditor extends React.PureComponent {
   timeout = undefined;

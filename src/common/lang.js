@@ -168,6 +168,7 @@ const lang = {
   MAINTENANCE_SUMMARY: 'Maintenance summary',
   MAINTENANCE_LOG: 'Maintenance log',
   MANAGEFILTERS: 'Manage filters',
+  MANAGE_PROFILES: 'Manage profiles',
   MANUAL: 'Manual',
   MANUFACTURER: 'Manufacturer',
   MAP_MODAL_CONTENT: 'The IoT Remote Monitoring Preview includes a static map. To learn how to add an interactive map, visit our',

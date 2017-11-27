@@ -3,7 +3,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import JsonEditor from '@dr-kobros/react-jsoneditor';
+import JsonEditor from '../jsonEditor/jsonEditor';
 import lang from '../../common/lang';
 import * as actions from '../../actions';
 import { getDeviceProfiles } from '../../actions/manageProfilesFlyoutActions';
@@ -100,7 +100,12 @@ class DeviceReconfigureFlyout extends React.Component {
   }
 
   render() {
-    let totalEffectedDevices = this.props.devices ? this.props.devices.length : 0;
+    const deepLinkSectionProps = {
+      path: `/maintenance/job/${this.state.jobId}`,
+      description: lang.VIEW_JOB_STATUS,
+      linkText: lang.VIEW
+    };
+    let totalAffectedDevices = this.props.devices ? this.props.devices.length : 0;
     const disabledButton = !this.state.jobName;
     return (
       <div className="device-configuration-container">
@@ -124,6 +129,7 @@ class DeviceReconfigureFlyout extends React.Component {
           <div className="jobname-reference">
             <span className="asterisk">*</span>
             {lang.JOB_NAME_REFERENCE}
+          </div>
         </div>
 
         <div className="marginTop20">
@@ -186,7 +192,7 @@ class DeviceReconfigureFlyout extends React.Component {
 
 const mapDispatchToProps = dispatch => ({
   getDeviceProfiles: () => {
-     dispatch(getDeviceProfiles());
+    dispatch(getDeviceProfiles());
   },
   actions: bindActionCreators(actions, dispatch)
 });
