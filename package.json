@@ -11,9 +11,10 @@
     "c3": "0.4.14",
     "chart.js": "2.6.0",
     "jquery": "3.2.1",
-    "jsoneditor": "^5.9.5",
+    "jsoneditor": "5.9.5",
     "lodash": "4.17.4",
     "moment": "2.18.1",
+    "prop-types": "15.6.0",
     "pubsub-js": "1.5.7",
     "react": "15.5.4",
     "react-bootstrap": "0.31.0",
@@ -25,6 +26,7 @@
     "redux": "3.7.0",
     "redux-thunk": "2.2.0",
     "rxjs": "5.4.2",
+    "styled-components": "2.2.3",
     "uuid": "3.1.0"
   },
   "devDependencies": {
