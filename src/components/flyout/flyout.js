@@ -4,6 +4,7 @@ import React from 'react';
 import DeviceDetailFlyout from './deviceDetailFlyout';
 import ManageFiltersFlyout from './manageFiltersFlyout';
 import ManageProfilesFlyout from './manageProfilesFlyout';
+import ProfileEditorFlyout from './profileEditorFlyout';
 import DeviceTagFlyout from './deviceTagFlyout';
 import DeviceDeletionFlyout from './deviceDeletionFlyout';
 import RuleOverviewFlyout from '../ruleOverview/ruleOverview';
@@ -27,6 +28,9 @@ const getFlyout = (content, onClose) => {
 
     case 'Manage Profiles':
       return <ManageProfilesFlyout content={content} onClose={onClose} />;
+
+    case 'Profile Editor':
+      return <ProfileEditorFlyout content={content} onClose={onClose} />;
 
     case 'Rule Detail':
       return <RuleOverviewFlyout content={content} onClose={onClose} />;

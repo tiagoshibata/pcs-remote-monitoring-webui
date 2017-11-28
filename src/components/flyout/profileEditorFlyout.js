@@ -3,16 +3,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import DMWizard from "../dmWizard/dmWizard";
+import PcsBtn from '../shared/pcsBtn/pcsBtn'
 import lang from "../../common/lang";
 import Schema from '../../schema/schema';
 import { saveOrUpdateProfile } from '../../actions/profileEditorActions';
 import JsonEditor from '../jsonEditor/jsonEditor';
 
-import './profileEditor.css';
-
+import './profileEditorFlyout.css';
+import 'jsoneditor/examples/css/darktheme.css'
 const isObject = x => x && typeof x === 'object' && !Array.isArray(x);
 
-class ProfileEditor extends React.Component {
+class ProfileEditorFlyout extends React.Component {
 
     constructor(props) {
         super(props);
@@ -50,23 +51,6 @@ class ProfileEditor extends React.Component {
       }
 
       return target;
-    }
-
-    checkJsonInput = event => {
-      let json;
-      try {
-          json = JSON.parse(event.target.value);
-      } catch (e) {
-          this.setState({message: 'JSON document is invalid'});
-          return;
-      }
-
-      const error = Schema.validateDesiredProperties(json);
-      if (error !== null) {
-          this.setState({message: error});
-          return;
-      }
-      this.setState({jsonInput: json, message: null});  /// FIXME use separate message state variables
     }
 
     mergeJsonInput = event => {
@@ -116,21 +100,20 @@ class ProfileEditor extends React.Component {
                 <div className="DMWizard">
                     <DMWizard />
                 </div>
-                <div className="profileEditorTable">
-                    <div>
-                      <button className="btn btn-default">
+                <div>
+                    <div className="dialog-buttons">
+                      <PcsBtn>
                         <label>
                           Upload a JSON document
-                          <input type="file" style={{position: 'fixed', top: '-100em'}} onChange={this.mergeJsonInput} />
+                          <input type="file" style={{position: "fixed", top: "-100em"}} onChange={this.mergeJsonInput} />
                         </label>
-                      </button>
+                      </PcsBtn>
                     </div>
-                    <JsonEditor ref={(editor) => { this.jsonEditor = editor; }} value={this.state.DesiredProperties} options={{mode: "tree"}} width='100%' height='500px' onChange={this.setProperties} />
-                    <textarea placeholder="Merge JSON document with editor" onChange={this.checkJsonInput}></textarea>
+                    <JsonEditor ref={(editor) => { this.jsonEditor = editor; }} value={this.state.DesiredProperties} options={{mode: "tree"}} width="100%" height="500px" onChange={this.setProperties} />
                 </div>
-                <div>
-                    <button className="btn btn-default profileEditorButton" onClick={this.save} disabled={this.state.message !== null}>Save</button>
-                    <button className="btn btn-default profileEditorButton" style={{ marginRight:"10px" }} onClick={this.props.onClose}>Cancel</button>
+                <div className="dialog-buttons">
+                    <PcsBtn onClick={this.save} disabled={this.state.message !== null} className="save">Save</PcsBtn>
+                    <PcsBtn onClick={this.props.onClose} className="cancel-button">Cancel</PcsBtn>
                 </div>
                 <div>
                     {this.state.message && <pre className="profileEditorWarning">{this.state.message}</pre>}
@@ -146,4 +129,4 @@ const mapDispatchToProps = dispatch => ({
     }
 });
 
-export default connect(null, mapDispatchToProps)(ProfileEditor);
+export default connect(null, mapDispatchToProps)(ProfileEditorFlyout);

@@ -14,11 +14,10 @@ import ApiService from '../../common/apiService';
 import EventTopic, { Topics } from '../../common/eventtopic';
 import Spinner from '../spinner/spinner';
 import DeepLinkSection from '../deepLinkSection/deepLinkSection';
-import { getTypeOf } from '../../common/utils';
 import PcsBtn from '../shared/pcsBtn/pcsBtn';
 import SummarySection from '../shared/summarySection/summarySection';
 import GenericDropDownList from '../../components/genericDropDownList/genericDropDownList';
-import ProfileEditor from '../../components/profileEditor/profileEditor';
+import ProfileEditorFlyout from './profileEditorFlyout';
 import Schema from '../../schema/schema';
 import './deviceReconfigureFlyout.css';
 
@@ -41,7 +40,6 @@ class DeviceReconfigureFlyout extends React.Component {
 
     this.onJobNameChange = this.onJobNameChange.bind(this);
     this.applyDeviceConfigureJobsData =this.applyDeviceConfigureJobsData.bind(this);
-    this.checkJobStatus = this.checkJobStatus.bind(this);
   }
 
   componentWillMount() {
@@ -142,11 +140,6 @@ class DeviceReconfigureFlyout extends React.Component {
                 initialState={{
                   defaultText: lang.PROFILE_CHOOSE
                 }}
-                newItem={{
-                  text: lang.PROFILE_NEW,
-                  dialog: ProfileEditor
-                }}
-                ref={(profileSelector) => { this.profileSelector = profileSelector; }}
                 publishTopic={Topics.profile.selected}
                 items={this.props.profiles}
               />
@@ -155,7 +148,7 @@ class DeviceReconfigureFlyout extends React.Component {
 
         <div className="jsoneditor-container">
           <JsonEditor width='100%' value={this.state.desiredProperties} options={{mode: 'tree'}} onChange={this.setProperties} ref={(editor) => { this.editor = editor; }} />
-          <pre className="schema-error">{this.state.message}</pre>
+          {this.state.message && <pre className="schema-error">{this.state.message}</pre>}
         </div>
 
         <div className="summary-container">
@@ -169,7 +162,6 @@ class DeviceReconfigureFlyout extends React.Component {
             </span>
           </div>
         </div>
-        {this.commonReconfigure()}
         <SummarySection count={totalAffectedDevices} content={lang.AFFECTED_DEVICES} />
         <div className="btn-container">
           <PcsBtn svg={CancelX} value={lang.CANCEL} onClick={this.props.onClose} />

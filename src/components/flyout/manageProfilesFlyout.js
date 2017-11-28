@@ -3,7 +3,7 @@
 import React from 'react';
 import {Modal} from "react-bootstrap";
 import { connect } from 'react-redux';
-import ProfileEditor from "../profileEditor/profileEditor";
+import * as actionTypes from '../../actions/actionTypes';
 import EditPencil from '../../assets/icons/EditPencil.svg';
 import Trash from '../../assets/icons/Trash.svg';
 import Add from '../../assets/icons/Add.svg';
@@ -26,10 +26,7 @@ class ManageProfilesFlyout extends React.Component {
   }
 
   showEditor = (profile) => {
-    this.setState({
-      targetProfile: profile,
-      showEditor: true
-    })
+    this.props.openProfileEditorFlyout();
   }
 
   showDeleteConfirmation = (profile) => {
@@ -49,7 +46,7 @@ class ManageProfilesFlyout extends React.Component {
   render() {
     return (
       <div className="manage-profile-container">
-        <div onClick={() => this.setState({showEditor: true})} className="create-profile">
+        <div onClick={() => this.showEditor(null)} className="create-profile">
           <img src={Add} alt={`${Add}`} className="add-icon" />
           {lang.CREATEPROFILE}
         </div>
@@ -81,12 +78,6 @@ class ManageProfilesFlyout extends React.Component {
           <div onClick={this.props.onClose}>Cancel</div>
         </div>
 
-        <Modal show={this.state.showEditor} bsSize='large'>
-          <Modal.Body>
-            <ProfileEditor onClose={() => this.setState({showEditor: false})} profile={this.state.targetProfile} />
-          </Modal.Body>
-        </Modal>
-
         <Modal show={this.state.showDeleteConfirmation} bsSize='large'>
           <Modal.Body>
             <p>Delete profile {(this.state.targetProfile || {}).DisplayName}?</p>
@@ -102,12 +93,12 @@ class ManageProfilesFlyout extends React.Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  getProperties: () => {
-     dispatch(getDeviceProfiles());
-  },
-  deleteProfile: (profile) => {
-     dispatch(deleteProfile(profile));
-  }
+  getProperties: () => dispatch(getDeviceProfiles()),
+  deleteProfile: (profile) => dispatch(deleteProfile(profile)),
+  openProfileEditorFlyout: profiles => dispatch({
+    type: actionTypes.FLYOUT_SHOW,
+    content: { type: 'Profile Editor', profiles }
+  }),
 });
 
 const mapStateToProps = state => ({
