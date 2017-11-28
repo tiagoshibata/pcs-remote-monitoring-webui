@@ -27,13 +27,7 @@ class DeviceReconfigureFlyout extends React.Component {
     super();
     this.subscriptions = [];
     this.state = {
-      desiredProperties: {
-        windows: {
-          rebootInfo: {
-            singleRebootTime: "2017-09-18T16:00:00-08:00"
-          }
-        }
-      },
+      desiredProperties: {},
       jobName: '',
       jobApplied: false
     };
