@@ -10,6 +10,7 @@ import JsonEditor from '../jsonEditor/jsonEditor';
 
 import './profileEditor.css';
 
+const isObject = x => x && typeof x === 'object' && !Array.isArray(x);
 
 class ProfileEditor extends React.Component {
 
@@ -36,8 +37,6 @@ class ProfileEditor extends React.Component {
     }
 
     mergeObjects(target, source) {
-      const isObject = x => x && typeof x === 'object' && !Array.isArray(x);
-
       for (const key in source) {
         if (isObject(source[key])) {
           if (!isObject(target[key])) {
@@ -70,9 +69,21 @@ class ProfileEditor extends React.Component {
       this.setState({jsonInput: json, message: null});  /// FIXME use separate message state variables
     }
 
-    mergeJsonInput = () => {
-      const mergedObject = this.mergeObjects(this.state.DesiredProperties, this.state.jsonInput);
-      this.setState({DesiredProperties: mergedObject});  /// FIXME Update editor
+    mergeJsonInput = event => {
+      const fileReader = new FileReader();
+      fileReader.onload = evt => {
+        let jsonData;
+        try {
+          jsonData = JSON.parse(evt.target.result);
+          console.assert(isObject(jsonData));
+        } catch (e) {
+          this.setState({message: "File doesn't have a valid JSON object"});
+          return;
+        }
+        const mergedObject = this.mergeObjects(this.state.DesiredProperties, jsonData);
+        this.setState({DesiredProperties: mergedObject});
+      };
+      fileReader.readAsText(event.target.files[0]);
     }
 
     onProfileNameChange = event => {
@@ -106,11 +117,16 @@ class ProfileEditor extends React.Component {
                     <DMWizard />
                 </div>
                 <div className="profileEditorTable">
+                    <div>
+                      <button className="btn btn-default">
+                        <label>
+                          Upload a JSON document
+                          <input type="file" style={{position: 'fixed', top: '-100em'}} onChange={this.mergeJsonInput} />
+                        </label>
+                      </button>
+                    </div>
                     <JsonEditor ref={(editor) => { this.jsonEditor = editor; }} value={this.state.DesiredProperties} options={{mode: "tree"}} width='100%' height='500px' onChange={this.setProperties} />
                     <textarea placeholder="Merge JSON document with editor" onChange={this.checkJsonInput}></textarea>
-                    <div>
-                      <button className="btn btn-default" onClick={this.mergeJsonInput}>Merge</button>
-                    </div>
                 </div>
                 <div>
                     <button className="btn btn-default profileEditorButton" onClick={this.save} disabled={this.state.message !== null}>Save</button>
