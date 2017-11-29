@@ -4,6 +4,10 @@ export function isFunction(value) {
   return typeof value === 'function';
 }
 
+export function isObject(x) {
+  return x && typeof x === 'object' && !Array.isArray(x);
+}
+
 export function getBoundaryChars(str) {
   if (!str) return;
   const len = str.length;
@@ -104,6 +108,24 @@ export function jsonEqual(a, b) {
 
 export function sanitizeJobName(jobName) {
   return jobName.replace(/[\W_]/g, "");
+}
+
+export function makeShallowObject(object, formatter) {
+  formatter = formatter || (x => x);
+  let shallow = {};
+  for (let key in object) {
+    let value = formatter(object[key]);
+    if (isObject(value)) {
+      let subObject = makeShallowObject(value, formatter);
+      let finalSubObject = {};
+      for (let subKey in subObject)
+        finalSubObject[key + '.' + subKey] = subObject[subKey];
+      Object.assign(shallow, finalSubObject);
+    } else {
+      shallow[key] = JSON.stringify(value);
+    }
+  }
+  return shallow;
 }
 
 export default {

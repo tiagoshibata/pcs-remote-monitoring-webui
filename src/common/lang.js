@@ -116,6 +116,7 @@ const lang = {
   ENTER_YOUR_KEY: 'Enter your key here...',
   EQUALS: '= Equals',
   ERRORS: 'Errors',
+  ERRORS_DESCRIPTION: 'Reported errors',
   EXISTS: 'E Exists',
   EVENT_NAME: 'Event Name',
   EXPLOREALARM: 'Explore Alarm',

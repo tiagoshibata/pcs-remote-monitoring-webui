@@ -12,6 +12,7 @@ import JsonEditor from '../jsonEditor/jsonEditor';
 import DeviceIcon from '../../assets/icons/DeviceIcon1.svg';
 import lang from '../../common/lang';
 import ApiService from '../../common/apiService';
+import { makeShallowObject, isObject } from '../../common/utils';
 import Timeline from '../charts/timeline';
 import AlarmsGrid from '../alarmList/alarmsGrid';
 import Config from '../../common/config';
@@ -319,6 +320,7 @@ class DeviceDetailFlyout extends Component {
     const { Properties, Tags, IsSimulated } = device;
     const { Reported } = Properties;
     const { SupportedMethods } = Reported;
+    const { errors } = Reported;
     const selectedColor = '#ffffff';
     const unselectedColor = '#afb9c3';
     const telemetryRadioBtnGroup = radioBtnOptions
@@ -363,6 +365,18 @@ class DeviceDetailFlyout extends Component {
       rowData: this.state.alarmRowData,
       pagination: false
     }
+    const formatError = value => {
+      if (isObject(value) && Object.keys(value).every(x => x === 'message' || x === 'code')) {
+        const { message, code } = value;
+        if (!message)
+          return code;
+        if (!code)
+          return message;
+        return 'Code ' + code + ': ' + message;
+      }
+      return value;
+    };
+    const shallowErrors = makeShallowObject(errors, formatError);
     return (
       <div className="device-detail-flyout">
         <div className="device-detail-tile">
@@ -506,6 +520,42 @@ class DeviceDetailFlyout extends Component {
               <JsonViewer showButton={false} data={this.state.rawMessage} />}
           </div>
         </Drawer>
+        {errors && (
+          <Drawer
+            toggle={true}
+            title={lang.ERRORS}
+            description={lang.ERRORS_DESCRIPTION}
+          >
+            <div className="drawer-content">
+              <table>
+                <thead>
+                  <tr>
+                    <th>
+                      {lang.ERRORS}
+                    </th>
+                    <th>
+                      {lang.MESSAGE}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.keys(shallowErrors).map(error => {
+                    return (
+                      <tr>
+                        <td>
+                          {error}
+                        </td>
+                        <td>
+                          {shallowErrors[error]}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </Drawer>
+        )}
         <div className="btn-group">
             <PcsBtn svg={CancelX} onClick={this.props.onClose}>{lang.CLOSE}</PcsBtn>
           </div>
