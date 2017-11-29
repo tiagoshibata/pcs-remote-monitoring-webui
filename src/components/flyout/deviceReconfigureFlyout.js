@@ -17,7 +17,6 @@ import DeepLinkSection from '../deepLinkSection/deepLinkSection';
 import PcsBtn from '../shared/pcsBtn/pcsBtn';
 import SummarySection from '../shared/summarySection/summarySection';
 import GenericDropDownList from '../../components/genericDropDownList/genericDropDownList';
-import ProfileEditorFlyout from './profileEditorFlyout';
 import Schema from '../../schema/schema';
 import './deviceReconfigureFlyout.css';
 

@@ -7,11 +7,13 @@ import { bindActionCreators } from 'redux';
 import Select from 'react-select';
 
 import * as actions from '../../actions';
+import { getDeviceProfiles } from '../../actions/manageProfilesFlyoutActions';
 import FlyoutSection from './flyoutSection/flyoutSection'
 import DeviceSimulationService from '../../services/deviceSimulationService';
 import IotHubManagerService from '../../services/iotHubManagerService';
 import PcsBtn from '../shared/pcsBtn/pcsBtn';
 import lang from '../../common/lang';
+import ApiService from '../../common/apiService';
 
 import './deviceProvisioningWorkflow.css';
 
@@ -73,6 +75,7 @@ class DeviceProvisioningWorkflow extends React.Component {
    * Makes a call to load the device models into the component state
    */
   componentDidMount() {
+    this.props.getDeviceProfiles();
     Rx.Observable
       .fromPromise(DeviceSimulationService.getDevicemodels())
       .map(models => models.map(value => ({ // Format the models list for the select component
@@ -191,7 +194,7 @@ class DeviceProvisioningWorkflow extends React.Component {
    * Makes the service call to create a new physical device
    */
   createPhysicalDevice() {
-    const { deviceId, authType, authKey, primaryKey, secondaryKey } = this.state;
+    const { deviceId, authType, authKey, primaryKey, secondaryKey, desiredProfile } = this.state;
     const authOptions = {};
     if (authKey !== authValues.AUTO) {
       if (authType === authTypes.SYMMETRIC) {
@@ -212,9 +215,26 @@ class DeviceProvisioningWorkflow extends React.Component {
         Authentication: authOptions
       })
     ).subscribe(
-      _ => {
-        this.props.actions.loadDevices(true);
-        this.props.onClose();
+      response => {
+        const cleanup = () => {
+          this.props.actions.loadDevices(true);
+          this.props.onClose();
+        }
+        if (desiredProfile) {
+          const deviceId = response.Id;
+          const payload = {
+            JobId: `initialize-${deviceId}`,
+            QueryCondition: `deviceId in ['${deviceId}']`,
+            updateTwin: {
+              Properties: {
+                Desired: desiredProfile.DesiredProperties
+              }
+            }
+          };
+          ApiService.scheduleJobs(payload).then(cleanup);
+        } else {
+          cleanup();
+        }
       },
       err => console.error(err)
     );
@@ -387,7 +407,7 @@ class DeviceProvisioningWorkflow extends React.Component {
       authKeyOptions.push({ value: authValues.AUTO, label: lang.AUTO_GENERATED_KEYS });
     }
     authKeyOptions.push({ value: authValues.MANUAL, label: lang.ENTER_KEYS_MANUALLY });
-
+    let profileOptions = this.props.profiles.map(x => ({value: x, label: x.DisplayName}));
     return (
       <div className="provision-device-form-container">
         <FlyoutSection header={'Number of devices'}>
@@ -431,6 +451,17 @@ class DeviceProvisioningWorkflow extends React.Component {
               onChange={this.handleInputChange} />
           </div>
         </FlyoutSection>
+        <FlyoutSection header={'Apply profile'}>
+          <Select
+            options={profileOptions}
+            value={this.state.desiredProfile}
+            clearable={true}
+            searchable={false}
+            autosize={true}
+            onChange={value => this.handleInputChange({ target: { name: 'desiredProfile', value: value.value } })}
+            placeholder={this.props.profiles.length ? lang.SELECT_PROFILE : lang.PROVISION_LOADING}
+          />
+        </FlyoutSection>
         {this.renderFormSummary()}
       </div>
     );
@@ -465,8 +496,13 @@ class DeviceProvisioningWorkflow extends React.Component {
   }
 }
 
-const mapDispatchToProps = dispatch => {
-  return { actions: bindActionCreators(actions, dispatch) };
-};
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(actions, dispatch),
+  getDeviceProfiles: () => dispatch(getDeviceProfiles()),
+});
 
-export default connect(undefined, mapDispatchToProps)(DeviceProvisioningWorkflow);
+const mapStateToProps = state => ({
+  profiles: state.profileReducer.profiles
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(DeviceProvisioningWorkflow);

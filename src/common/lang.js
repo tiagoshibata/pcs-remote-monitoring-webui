@@ -255,6 +255,7 @@ const lang = {
   SELECT_EXISTING_DVICE_TYPE: 'Select existing device type',
   SELECT_ONE: 'Select one',
   SELECT_PLACEHOLDER: 'Select method',
+  SELECT_PROFILE: 'Select a profile',
   SENCONDARYTHUMBPRINT: 'Secondary thumbprint',
   SEVERITY: 'Severity',
   SEVERITYLEVEL: 'Severity level',
