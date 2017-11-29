@@ -13,6 +13,8 @@ export const checkboxParams = {
   checkboxSelection: true
 };
 
+const formatObjectKeys = (object) => Object.keys(object || {}).join('; ') || EMPTY_FIELD_VAL;
+
 /** A collection of column definitions for the devices grid */
 export const deviceColumnDefs = {
   id: {
@@ -43,7 +45,7 @@ export const deviceColumnDefs = {
   telemetry: {
     headerName: lang.TELEMETRY,
     field: 'Properties.Reported.Telemetry',
-    valueFormatter: ({ value }) => Object.keys(value || {}).join('; ') || EMPTY_FIELD_VAL
+    valueFormatter: ({ value }) => formatObjectKeys(value)
   },
   status: {
     headerName: lang.STATUS,
@@ -52,13 +54,13 @@ export const deviceColumnDefs = {
   },
   errors: {
     headerName: lang.ERRORS,
-    field: 'Properties.Reported.windows.errors',
-    valueFormatter: ({ value }) => checkForEmpty(value)
+    field: 'Properties.Reported.errors',
+    valueFormatter: ({ value }) => formatObjectKeys(value)
   },
   compliant: {
     headerName: lang.COMPLIANT,
-    field: 'Properties.Reported.windows.applying',
-    valueFormatter: ({ value }) => checkForEmpty(value)
+    field: 'Properties.Reported.applying',
+    valueFormatter: ({ value }) => formatObjectKeys(value)
   },
 };
 
