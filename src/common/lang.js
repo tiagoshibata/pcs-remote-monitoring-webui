@@ -157,7 +157,7 @@ const lang = {
   LASTMONTH: 'Last month',
   LASTREFRESHED: 'last refreshed',
   LASTSTATUSUPDATEDTIME: 'Last status updated time',
-  LASTTRIGGER: 'Last Trigger',
+  LAST_TELEMETRY_TRIGGER: 'Last Telemetry Trigger',
   LASTWEEK: 'Last week',
   LAST_EVENT: 'LAST EVENT',
   LAST_MSG: 'Last message',

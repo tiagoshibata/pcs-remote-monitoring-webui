@@ -91,6 +91,7 @@ class AlarmList extends Component {
 
     if (nextProps.rulesAndActions) {
       this.rulesAndActionsEmitter.next(nextProps.rulesAndActions);
+      this.updateDeviceTwinAlarms(nextProps.rulesAndActions);
     }
   }
 
@@ -115,6 +116,34 @@ class AlarmList extends Component {
 
   refresh(eventName, delayAmount) {
     this.pollingManager.emit(eventName, this.createGetDataEvent, delayAmount);
+  }
+
+  updateDeviceTwinAlarms = (rulesAndActions) => {
+    for (let rule of rulesAndActions) {
+      // If rule has no telemetry conditions, trigger it based on the device twin state
+      if (rule.Conditions.length)
+        return;
+      let matchedGroup = this.props.deviceGroups.filter(group => group.Id === rule.GroupId);
+      if (!matchedGroup.length)
+        return;
+      ApiService.getDevicesForGroup(matchedGroup[0].Conditions)
+        .then(response => {
+          if (response.items !== undefined) {
+            console.log(rule, response.items.length);
+            if (response.items.length)
+              this.setState({...this.state, rowData: [...this.state.rowData, {
+                rulename: rule.Name,
+                severity: rule.Severity,
+                occurrences: response.items.length
+              }]});
+            // console.log(response.items);
+            // this.setState({ timeRange: nextProps.timeRange, rowData: undefined }, () => this.refresh() );
+          }
+        })
+        .catch(err => {
+          this.props.node.setData(Object.assign({}, this.props.data, {apiCallStarted: true, DeviceCount: 0}));
+        });
+    }
   }
 
   render() {

@@ -66,7 +66,7 @@ export const rulesAndActionsColumnDefs = {
     cellRendererFramework: deviceCountCellRenderer,
   },
   lastTrigger: {
-    headerName: lang.LASTTRIGGER,
+    headerName: lang.LAST_TELEMETRY_TRIGGER,
     cellRendererFramework: LastTriggerCellRenderer,
     width: LastTriggerDefaultWidth
   }
