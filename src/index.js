@@ -24,7 +24,7 @@ import "./polyfills";
 import "./index.css";
 
 const app = document.getElementById("root");
-const store = configureStore(initialState);
+export const store = configureStore(initialState);
 const closeOpenFlyouts = () => store.dispatch({ type: actionTypes.FLYOUT_HIDE });
 
 // Start sign in process if required

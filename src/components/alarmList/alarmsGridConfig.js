@@ -2,6 +2,8 @@
 
 import React from 'react';
 import lang from '../../common/lang';
+import { store } from '../../index';
+import { loadRegionSpecificDevices } from '../../actions/filterActions';
 import severityCellRenderer from '../cellRenderers/severityCellRenderer/severityCellRenderer';
 import ElipsisCellRenderer from '../cellRenderers/elipsisCellRenderer/elipsisCellRenderer';
 import { gridValueFormatters } from '../pcsGrid/pcsGridConfig';
@@ -56,7 +58,11 @@ export const alarmColumnDefs = {
     tooltipField: "Connected",
     headerTooltip: lang.EXPLOREALARM,
     width: 300,
-    cellRendererFramework: ({ data }) => <ElipsisCellRenderer to={`/maintenance/rule/${data.ruleId}`} />
+    cellRendererFramework: ({ data }) =>
+      <ElipsisCellRenderer
+        to={data.deviceGroup ? '/devices' : `/maintenance/rule/${data.ruleId}`}
+        onClick={data.deviceGroup && (() => store.dispatch(loadRegionSpecificDevices([], data.deviceGroup)))}
+      />
   }
 };
 

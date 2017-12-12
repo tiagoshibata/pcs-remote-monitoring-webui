@@ -11,7 +11,7 @@ import './elipsisCellRenderer.css'
 class ElipsisCellRenderer extends React.Component {
   render() {
     return (
-      <Link className="pcs-renderer-cell elipsis-renderer" to={this.props.to}>
+      <Link className="pcs-renderer-cell elipsis-renderer" to={this.props.to} onClick={this.props.onClick}>
         <img src={ElipsisSvg} className="pcs-renderer-icon" alt='Click to explorer' />
       </Link>
     );

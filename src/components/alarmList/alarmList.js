@@ -49,6 +49,7 @@ class AlarmList extends Component {
         description: rule.Description,
         severity: rule.Severity,
         ruleId: rule.Id,
+        deviceGroup: rule.GroupId
       }))
       .scan((acc, curr) => [...acc.filter(x => x.ruleId !== curr.ruleId), curr], [])
   }
