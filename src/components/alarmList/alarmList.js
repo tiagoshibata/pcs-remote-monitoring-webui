@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 
 import React, { Component } from 'react';
+import {connect} from "react-redux";
 import Rx from 'rxjs';
 
 import lang from '../../common/lang';
@@ -27,10 +28,29 @@ class AlarmList extends Component {
     this.pollingManager = new PollingManager();
     this.subscriptions = [];
     this.rulesAndActionsEmitter = new Rx.BehaviorSubject(undefined);
-    this.rulesAndActionsStream = this.rulesAndActionsEmitter
+    this.validRulesAndActionsStream = this.rulesAndActionsEmitter
       .filter(_ => _)
-      .distinct()
+      .distinct();
+    this.rulesAndActionsStream = this.validRulesAndActionsStream
       .map(rulesAndActions => rulesAndActions.reduce((acc, { Id, Name }) => ({ ...acc, [Id]: Name }), {}));
+    this.deviceTwinAlarmsStream = this.validRulesAndActionsStream
+      .concatMap(_ => _)
+      // Rules without telemetry conditions are triggered by Device Twin changes
+      .filter(rule => !rule.Conditions.length)  // no telemetry conditions
+      .map(rule => ({rule, matchedGroup: this.props.deviceGroups.filter(group => group.Id === rule.GroupId)}))
+      .filter(({rules, matchedGroup}) => matchedGroup && matchedGroup.length)
+      .flatMap(({rule, matchedGroup}) => Rx.Observable.fromPromise(ApiService.getDevicesForGroup(matchedGroup[0].Conditions))
+        .map(devices => ({rule, devices}))
+      )
+      .filter(({rule, devices}) => devices.items && devices.items.length)
+      .map(({rule, devices}) => ({
+        ruleName: rule.Name,
+        occurrences: devices.items.length,
+        description: rule.Description,
+        severity: rule.Severity,
+        ruleId: rule.Id,
+      }))
+      .scan((acc, curr) => [...acc.filter(x => x.ruleId !== curr.ruleId), curr], [])
   }
 
   componentDidMount() {
@@ -56,6 +76,7 @@ class AlarmList extends Component {
             }))
             .reduce((acc, curr) => [...acc, curr], [])
         )
+        .combineLatest(this.deviceTwinAlarmsStream, (telemetryAlarms, deviceTwinAlarms) => [...telemetryAlarms, ...deviceTwinAlarms])
         .do(_ => this.refresh(`intervalRefresh`, Config.INTERVALS.TELEMETRY_UPDATE_MS))
         .subscribe(
           rowData => this.setState({ rowData, loading: false }),
@@ -91,7 +112,6 @@ class AlarmList extends Component {
 
     if (nextProps.rulesAndActions) {
       this.rulesAndActionsEmitter.next(nextProps.rulesAndActions);
-      this.updateDeviceTwinAlarms(nextProps.rulesAndActions);
     }
   }
 
@@ -118,34 +138,6 @@ class AlarmList extends Component {
     this.pollingManager.emit(eventName, this.createGetDataEvent, delayAmount);
   }
 
-  updateDeviceTwinAlarms = (rulesAndActions) => {
-    for (let rule of rulesAndActions) {
-      // If rule has no telemetry conditions, trigger it based on the device twin state
-      if (rule.Conditions.length)
-        return;
-      let matchedGroup = this.props.deviceGroups.filter(group => group.Id === rule.GroupId);
-      if (!matchedGroup.length)
-        return;
-      ApiService.getDevicesForGroup(matchedGroup[0].Conditions)
-        .then(response => {
-          if (response.items !== undefined) {
-            console.log(rule, response.items.length);
-            if (response.items.length)
-              this.setState({...this.state, rowData: [...this.state.rowData, {
-                rulename: rule.Name,
-                severity: rule.Severity,
-                occurrences: response.items.length
-              }]});
-            // console.log(response.items);
-            // this.setState({ timeRange: nextProps.timeRange, rowData: undefined }, () => this.refresh() );
-          }
-        })
-        .catch(err => {
-          this.props.node.setData(Object.assign({}, this.props.data, {apiCallStarted: true, DeviceCount: 0}));
-        });
-    }
-  }
-
   render() {
     // Pass an empty string to avoid two spinners appearing on top of each other
     const alarmsGridProps = {
@@ -169,4 +161,8 @@ class AlarmList extends Component {
   }
 }
 
-export default AlarmList;
+const mapStateToProps = state => ({
+  deviceGroups: state.filterReducer.deviceGroups
+});
+
+export default connect(mapStateToProps, null)(AlarmList);
