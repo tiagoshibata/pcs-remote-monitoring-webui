@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
-import DMWizard from "../dmWizard/dmWizard";
 import PcsBtn from '../shared/pcsBtn/pcsBtn'
 import lang from "../../common/lang";
 import Schema from '../../schema/schema';
@@ -17,12 +16,14 @@ class ProfileEditorFlyout extends React.Component {
 
     constructor(props) {
         super(props);
-        if (props.profile) {
+        console.log(props);
+        const profile = props.content && props.content.profile;
+        if (profile) {
             this.state = {
-                Id: props.profile.Id,
-                ETag: props.profile.ETag,
-                DisplayName: props.profile.DisplayName,
-                DesiredProperties: props.profile.DesiredProperties
+                Id: profile.Id,
+                ETag: profile.ETag,
+                DisplayName: profile.DisplayName,
+                DesiredProperties: profile.DesiredProperties
             };
         } else {
             this.state = {
@@ -96,9 +97,6 @@ class ProfileEditorFlyout extends React.Component {
                 <div className= "profileEditorLabel">
                     <label>{lang.PROFILE_NAME}</label>
                     <input className="form-control" style={{ width: "500px" }} value={this.state.DisplayName} placeholder={lang.PROFILE_NAME_PLACEHOLDER} onChange={this.onProfileNameChange} />
-                </div>
-                <div className="DMWizard">
-                    <DMWizard />
                 </div>
                 <div>
                     <div className="dialog-buttons">

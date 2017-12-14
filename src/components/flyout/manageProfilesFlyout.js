@@ -26,7 +26,7 @@ class ManageProfilesFlyout extends React.Component {
   }
 
   showEditor = (profile) => {
-    this.props.openProfileEditorFlyout();
+    this.props.openProfileEditorFlyout(profile);
   }
 
   showDeleteConfirmation = (profile) => {
@@ -95,9 +95,9 @@ class ManageProfilesFlyout extends React.Component {
 const mapDispatchToProps = dispatch => ({
   getProperties: () => dispatch(getDeviceProfiles()),
   deleteProfile: (profile) => dispatch(deleteProfile(profile)),
-  openProfileEditorFlyout: profiles => dispatch({
+  openProfileEditorFlyout: profile => dispatch({
     type: actionTypes.FLYOUT_SHOW,
-    content: { type: 'Profile Editor', profiles }
+    content: { type: 'Profile Editor', profile }
   }),
 });
 
